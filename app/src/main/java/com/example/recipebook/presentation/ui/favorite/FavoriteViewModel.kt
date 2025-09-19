@@ -1,13 +1,13 @@
-package com.example.recipebook.presentation.ui.gallery
+package com.example.recipebook.presentation.ui.favorite
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class GalleryViewModel : ViewModel() {
+class FavoriteViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
-        value = "This is gallery Fragment"
+        value = "This is favorite Fragment"
     }
     val text: LiveData<String> = _text
 }

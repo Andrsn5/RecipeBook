@@ -55,8 +55,6 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    // gson
-    implementation(libs.gson)
 
     // jetpack DataStore
     implementation(libs.androidx.dataStore)
@@ -78,7 +76,8 @@ dependencies {
 
     //Retrofit + OkHttp
     implementation(libs.retrofit)
-    implementation(libs.retrofit.gson)
+    implementation(libs.retrofit.kotlinx.serialization.converter)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
 
