@@ -1,4 +1,4 @@
-package com.example.recipebook.ui.home
+package com.example.recipebook.presentation.ui.home
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

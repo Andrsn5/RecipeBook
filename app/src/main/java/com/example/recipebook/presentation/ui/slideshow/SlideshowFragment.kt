@@ -1,4 +1,4 @@
-package com.example.recipebook.ui.slideshow
+package com.example.recipebook.presentation.ui.slideshow
 
 import android.os.Bundle
 import android.view.LayoutInflater
