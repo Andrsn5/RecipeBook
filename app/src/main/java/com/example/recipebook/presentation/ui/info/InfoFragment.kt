@@ -22,17 +22,8 @@ class InfoFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val InfoViewModel =
-            ViewModelProvider(this).get(InfoViewModel::class.java)
 
-        _binding = FragmentInfoBinding.inflate(inflater, container, false)
-        val root: View = binding.root
-
-        val textView: TextView = binding.textFavorite
-        InfoViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
-        }
-        return root
+        return binding.root
     }
 
     override fun onDestroyView() {
