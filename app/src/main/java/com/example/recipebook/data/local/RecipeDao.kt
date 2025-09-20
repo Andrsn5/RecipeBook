@@ -11,8 +11,8 @@ interface RecipeDao {
     @Query("SELECT * FROM recipes ORDER BY id ASC")
     fun getAll(): Flow<List<RecipeEntity>>
 
-    @Query("SELECT * FROM recipes WHERE id =id LIMIT 1")
-    fun getById(id: String): Flow<RecipeEntity>
+    @Query("SELECT * FROM recipes WHERE id = :id LIMIT 1")
+    fun getById(id: String): Flow<RecipeEntity?>
 
     @Query("SELECT * FROM recipes WHERE title LIKE '%' || :query || '%' ORDER BY title ASC")
     fun search(query: String): Flow<List<RecipeEntity>>

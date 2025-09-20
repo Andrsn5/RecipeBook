@@ -7,6 +7,7 @@ import com.example.recipebook.domain.model.Recipe
 import com.example.recipebook.domain.repository.RecipeRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class RecipeRepositoryImpl @Inject constructor(
@@ -21,11 +22,18 @@ class RecipeRepositoryImpl @Inject constructor(
         dao.search(query).map { RecipeMapper.entityListToDomain(it) }
 
     override fun getRecipeById(id: String): Flow<Recipe> =
-        dao.getById(id).map { it?.let { RecipeMapper.entityToDomain(it) } }
+        dao.getById(id).map { entity ->
+            entity?.let { RecipeMapper.entityToDomain(it) }
+                ?: throw NoSuchElementException("Recipe with id $id not found")
+        }
 
     override fun getFavoriteRecipes(): Flow<List<Recipe>> =
         dao.getFavorites().map { RecipeMapper.entityListToDomain(it) }
 
     override suspend fun toggleFavorite(recipeId: String) {
-        val recipe = dao.getById(recipeId)}
+        val recipe = dao.getById(recipeId).first()
+        recipe?.let {
+            dao.updateFavorite(recipeId, !it.isFavorite)
+        }
+    }
 }

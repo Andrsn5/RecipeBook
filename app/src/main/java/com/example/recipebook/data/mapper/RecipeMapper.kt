@@ -2,6 +2,7 @@ package com.example.recipebook.data.mapper
 
 import com.example.recipebook.data.local.RecipeEntity
 import com.example.recipebook.data.remote.RecipeDto
+import com.example.recipebook.domain.model.Recipe
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -22,19 +23,24 @@ object RecipeMapper {
             description = dto.description,
             ingredients = json.encodeToString(dto.ingredients ?: emptyList()),
             isFavorite = false,
-            lastUpdate = 0)
+            lastUpdate = System.currentTimeMillis()
+        )
 
-    fun entityToDomain(entity: RecipeEntity): RecipeDto =
-        RecipeDto(
+    fun entityToDomain(entity: RecipeEntity): Recipe =
+        Recipe(
             id = entity.id,
-            title = entity.title,
+            name = entity.title,
+            description = entity.description,
             imageUrl = entity.imageUrl,
             category = entity.category,
-            description = entity.description,
-            ingredients = json.decodeFromString(entity.ingredients),
-            isFavorite = entity.isFavorite,
-            lastUpdate = entity.lastUpdate)
+            ingredients = try {
+                json.decodeFromString(entity.ingredients)
+            } catch (e: Exception) {
+                emptyList()
+            },
+            favourite = entity.isFavorite
+        )
 
-    fun entityListToDomain(list: List<RecipeEntity>) = list.map { entityToDomain(it) }
-    fun dtoListToEntity(list: List<RecipeDto>) = list.map { dtoToEntity(it) }
+    fun entityListToDomain(list: List<RecipeEntity>): List<Recipe> = list.map { entityToDomain(it) }
+    fun dtoListToEntity(list: List<RecipeDto>): List<RecipeEntity> = list.map { dtoToEntity(it) }
 }

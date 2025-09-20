@@ -20,7 +20,7 @@ class SettingFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val settingViewModel =
-            ViewModelProvider(this).get(InfoViewModel::class.java)
+            ViewModelProvider(this).get(SettingViewModel::class.java)
 
         _binding = FragmentSettingBinding.inflate(inflater, container, false)
         val root: View = binding.root

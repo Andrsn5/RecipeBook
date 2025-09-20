@@ -8,16 +8,33 @@ plugins {
 
 android {
     namespace = "com.example.recipebook"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.recipebook"
         minSdk = 29
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            abiFilters.addAll(listOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a"))
+        }
+        //noinspection WrongGradleMethod
+        hilt {
+            enableAggregatingTask = false
+        }
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            force("org.jetbrains.kotlin:kotlin-stdlib:1.9.0")
+            force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0")
+            force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")
+            force("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+        }
     }
 
     buildTypes {
@@ -30,14 +47,19 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
     buildFeatures {
         viewBinding = true
+    }
+    configurations.all {
+        resolutionStrategy {
+            force("com.squareup:javapoet:1.13.0")
+        }
     }
 }
 
@@ -51,9 +73,12 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.transport.runtime)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+
 
 
     // jetpack DataStore
@@ -63,13 +88,13 @@ dependencies {
     implementation(libs.androidx.room.common.jvm)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    kapt("androidx.room:room-compiler:2.6.1")
+    kapt(libs.androidx.room.compiler)
 
 
 
     //Hilt
     implementation(libs.google.dagger)
-    kapt("com.google.dagger:hilt-compiler:2.48")
+    kapt(libs.google.dagger.compiler)
 
     //viewModel
     implementation(libs.androidx.fragment)
@@ -89,6 +114,5 @@ dependencies {
 
     // Lifecycle Runtime
     implementation(libs.androidx.lifecycle.runtime.ktx)
-
 
 }
