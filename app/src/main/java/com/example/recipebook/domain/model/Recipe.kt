@@ -6,4 +6,5 @@ data class Recipe(val id: String,
                   val imageUrl: String?,
                   val category: String,
                   val ingredients: List<String> = emptyList(),
-                  val favourite: Boolean)
+                  val favourite: Boolean,
+                  val ingredientsImagine: List<String>)

@@ -9,11 +9,15 @@
         android:id="@+id/nav_home"
         android:name="com.example.recipebook.presentation.ui.home.HomeFragment"
         android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home">
+        <action
+        android:id="@+id/action_homeFragment_to_detailsFragment"
+        app:destination="@id/detailsFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_favorite"
-        android:name="com.example.recipebook.presentation.ui.favorite.FavoriteFragment"
+        android:name="com.example.recipebook.presentation.ui.favorite.FavoritesFragment"
         android:label="@string/menu_favorite"
         tools:layout="@layout/fragment_favorite" />
 
@@ -21,12 +25,45 @@
         android:id="@+id/nav_info"
         android:name="com.example.recipebook.presentation.ui.info.InfoFragment"
         android:label="@string/menu_info"
-        tools:layout="@layout/fragment_info" />
+        tools:layout="@layout/fragment_info" >
+        <action
+            android:id="@+id/action_searchFragment_to_detailsFragment"
+            app:destination="@id/detailsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/categoriesFragment"
+        android:name="com.example.recipebook.presentation.ui.categories.CategoriesFragment"
+        android:label="@string/menu_categories"
+        tools:layout="@layout/fragment_categories">
+        <action
+            android:id="@+id/action_categoriesFragment_to_homeFragment"
+            app:destination="@id/nav_home"
+            app:popUpTo="@id/categoriesFragment"
+            app:popUpToInclusive="false" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/detailsFragment"
+        android:name="com.example.recipebook.presentation.ui.details.DetailsFragment"
+        android:label="@string/description"
+        tools:layout="@layout/fragment_details" />
+
+    <fragment
+        android:id="@+id/favoritesFragment"
+        android:name="com.example.recipebook.presentation.ui.favorite.FavoritesFragment"
+        android:label="@string/menu_favorite"
+        tools:layout="@layout/fragment_favorite">
+        <action
+            android:id="@+id/action_favoritesFragment_to_detailsFragment"
+            app:destination="@id/detailsFragment" />
+    </fragment>
+
 
     <fragment
         android:id="@+id/nav_settings"
         android:name="com.example.recipebook.presentation.ui.setting.SettingFragment"
-        android:label="@string/menu_info"
+        android:label="@string/menu_setting"
         tools:layout="@layout/fragment_setting" />
 
 </navigation>
