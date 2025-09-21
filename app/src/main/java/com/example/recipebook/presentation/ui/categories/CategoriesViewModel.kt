@@ -2,6 +2,7 @@ package com.example.recipebook.presentation.ui.categories
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.recipebook.domain.model.Category
 import com.example.recipebook.domain.model.Recipe
 import com.example.recipebook.domain.usecase.GetCategoriesUseCase
 import com.example.recipebook.presentation.ui.state.UiState
@@ -19,14 +20,14 @@ class CategoriesViewModel @Inject constructor(
     private val getCategoriesUseCase: GetCategoriesUseCase
 ): ViewModel(){
 
-    private val _state = MutableStateFlow<UiState<List<Recipe>>>(UiState.Loading)
-    val state:MutableStateFlow<UiState<List<Recipe>>> = _state
+    private val _state = MutableStateFlow<UiState<List<Category>>>(UiState.Loading)
+    val state:MutableStateFlow<UiState<List<Category>>> = _state
 
     init {
         getCategories()
     }
 
-    private fun getCategories() {
+    fun getCategories() {
         viewModelScope.launch {
             getCategoriesUseCase()
                 .onEach { category ->
@@ -39,6 +40,8 @@ class CategoriesViewModel @Inject constructor(
                 .collect()
         }
     }
+
+
 
 
 }

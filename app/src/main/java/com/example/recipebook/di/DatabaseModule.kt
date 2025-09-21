@@ -23,6 +23,10 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideRecipeDao(database: AppDatabase) = database.recipeDao()
+
+    @Provides
+    @Singleton
+    fun provideCategoryDao(database: AppDatabase) = database.categoryDao()
 }
 
 

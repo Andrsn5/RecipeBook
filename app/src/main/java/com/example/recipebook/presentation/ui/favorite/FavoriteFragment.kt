@@ -71,7 +71,7 @@ class FavoritesFragment : Fragment() {
             }
         }
 
-        viewModel.loadFavorites()
+        viewModel.loadFavorite()
     }
 
     override fun onDestroyView() {

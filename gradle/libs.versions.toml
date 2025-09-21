@@ -27,6 +27,7 @@ lifecycle = "2.8.6"
 kotlinx-serialization = "1.6.0"
 retrofit-kotlinx-serialization-converter = "1.0.0"
 transportRuntime = "4.0.0"
+roomCompilerProcessingTesting = "2.8.0"
 
 
 
@@ -73,6 +74,7 @@ kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 # Lifecycle
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
 transport-runtime = { group = "com.google.android.datatransport", name = "transport-runtime", version.ref = "transportRuntime" }
+androidx-room-compiler-processing-testing = { group = "androidx.room", name = "room-compiler-processing-testing", version.ref = "roomCompilerProcessingTesting" }
 
 
 

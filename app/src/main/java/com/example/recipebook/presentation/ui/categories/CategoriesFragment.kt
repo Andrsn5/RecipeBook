@@ -34,7 +34,7 @@ class CategoriesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         adapter = CategoriesAdapter { category ->
             val action =
-                FragmentCategoriesDirections.actionCategoriesFragmentToHomeFragment(category)
+                CategoriesFragmentDirections.actionCategoriesFragmentToHomeFragment(category)
             findNavController().navigate(action)
         }
         binding.recyclerView.adapter = adapter
@@ -66,7 +66,7 @@ class CategoriesFragment : Fragment() {
             }
         }
 
-        viewModel.loadCategories()
+        viewModel.getCategories()
     }
 
     override fun onDestroyView() {

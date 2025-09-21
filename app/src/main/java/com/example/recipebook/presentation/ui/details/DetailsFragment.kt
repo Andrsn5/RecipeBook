@@ -41,7 +41,6 @@ class DetailsFragment: Fragment() {
 
         lifecycleScope.launch {
 
-
             binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
             binding.recyclerView.adapter = adapter
 

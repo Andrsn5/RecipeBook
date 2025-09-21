@@ -9,9 +9,11 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.recipebook.databinding.SearchFragmentBinding
+import com.example.recipebook.databinding.FragmentSearchBinding
 import com.example.recipebook.presentation.adapter.RecipeAdapter
+import com.example.recipebook.presentation.ui.favorite.FavoritesFragmentDirections
 import com.example.recipebook.presentation.ui.state.UiState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -19,7 +21,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class SearchFragment : Fragment() {
 
-    private var _binding: SearchFragmentBinding? = null
+    private var _binding: FragmentSearchBinding? = null
     val binding get() = _binding!!
 
     private val viewModel: SearchViewModel by viewModels()
@@ -30,14 +32,21 @@ class SearchFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = SearchFragmentBinding.inflate(layoutInflater)
+        _binding = FragmentSearchBinding.inflate(layoutInflater)
         return _binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        adapter = RecipeAdapter { recipe ->
-            // Навигация к деталям рецепта
-        }
+        adapter = RecipeAdapter(
+            onClick = { recipe ->
+                val action =
+                    SearchFragmentDirections.actionSearchFragmentToHomeFragment(recipe.name)
+                findNavController().navigate(action)
+            },
+            onFavClick = { recipe ->
+
+            }
+        )
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.adapter = adapter
 

@@ -7,9 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.recipebook.databinding.FragmentHomeBinding
 import com.example.recipebook.presentation.adapter.RecipeAdapter
+import com.example.recipebook.presentation.ui.favorite.FavoritesFragmentDirections
 import com.example.recipebook.presentation.ui.state.UiState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -35,9 +37,16 @@ class HomeFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        adapter = RecipeAdapter { recipe ->
-            // navigate 
-        }
+        adapter = RecipeAdapter(
+            onClick = { recipe ->
+                val action =
+                    HomeFragmentDirections.actionHomeFragmentToDetailsFragment(recipe.id)
+                findNavController().navigate(action)
+            },
+            onFavClick = { recipe ->
+                viewModel.toggleFavorite(recipe.id)
+            }
+        )
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.adapter = adapter
         

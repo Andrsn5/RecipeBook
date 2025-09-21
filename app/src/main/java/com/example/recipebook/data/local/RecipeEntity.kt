@@ -10,7 +10,8 @@ data class RecipeEntity(
     val imageUrl: String,
     val category: String,
     val description: String,
-    val ingredients: String,
+    val ingredients: List<String>,
+    val ingredientsImage: List<String>,
     val isFavorite: Boolean = false,
     val lastUpdate: Long = System.currentTimeMillis()
 )

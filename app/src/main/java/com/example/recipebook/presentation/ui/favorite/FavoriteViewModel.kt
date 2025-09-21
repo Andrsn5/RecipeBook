@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.recipebook.domain.model.Recipe
 import com.example.recipebook.domain.usecase.GetFavoritesUseCase
+import com.example.recipebook.domain.usecase.ToggleFavoriteUseCase
 import com.example.recipebook.presentation.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FavoriteViewModel @Inject constructor(
-    private val getFavoritesUseCase: GetFavoritesUseCase
+    private val getFavoritesUseCase: GetFavoritesUseCase,
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase
 ): ViewModel() {
 
     private val _state = MutableStateFlow<UiState<List<Recipe>>>(UiState.Loading)
@@ -27,7 +29,7 @@ class FavoriteViewModel @Inject constructor(
         loadFavorite()
     }
 
-    private fun loadFavorite() {
+    fun loadFavorite() {
         viewModelScope.launch {
             getFavoritesUseCase()
                 .onEach { recipes ->
@@ -43,9 +45,12 @@ class FavoriteViewModel @Inject constructor(
                 .collect()
             }
         }
+    fun toggleFavorite(id: String){
+        viewModelScope.launch {
+            toggleFavoriteUseCase(id)
+        }
     }
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is favorite Fragment"
     }
-    val text: LiveData<String> = _text
+
+

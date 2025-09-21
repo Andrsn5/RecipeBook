@@ -7,7 +7,7 @@ data class RecipeDto(
     val category: String,
     val description: String,
     val ingredients: List<String>,
+    val ingredientsImage: List<String>,
     val isFavorite: Boolean = false,
     val lastUpdate: Long = 0
-){
-}
+)

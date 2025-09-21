@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.recipebook.databinding.ItemCategoryBinding
+import com.example.recipebook.domain.model.Category
 import com.example.recipebook.domain.model.Recipe
 
 
@@ -11,9 +12,9 @@ class CategoriesAdapter(
     private val onClick: (String) -> Unit
 ) : RecyclerView.Adapter<CategoriesAdapter.ViewHolder>() {
 
-    private val items = mutableListOf<Recipe>()
+    private val items = mutableListOf<Category>()
 
-    fun submitList(list: List<Recipe>) {
+    fun submitList(list: List<Category>) {
         items.clear()
         items.addAll(list)
         notifyDataSetChanged()
@@ -23,9 +24,9 @@ class CategoriesAdapter(
         private val binding: ItemCategoryBinding,
         private val onClick: (String) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(category: Recipe) {
-            binding.categoryName.text = category.category
-            binding.root.setOnClickListener { onClick(category.category) }
+        fun bind(category: Category) {
+            binding.categoryName.text = category.name
+            binding.root.setOnClickListener { onClick(category.name) }
         }
     }
 

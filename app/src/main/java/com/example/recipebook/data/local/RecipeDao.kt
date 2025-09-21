@@ -20,6 +20,7 @@ interface RecipeDao {
     @Query("SELECT * FROM recipes WHERE isFavorite = 1 ORDER BY title ASC")
     fun getFavorites(): Flow<List<RecipeEntity>>
 
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(recipes: List<RecipeEntity>)
 
