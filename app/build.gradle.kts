@@ -59,6 +59,7 @@ android {
     configurations.all {
         resolutionStrategy {
             force("com.squareup:javapoet:1.13.0")
+
         }
     }
 }
@@ -73,8 +74,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
-    implementation(libs.transport.runtime)
-    implementation(libs.androidx.room.compiler.processing.testing)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -95,6 +94,7 @@ dependencies {
 
     //Hilt
     implementation(libs.google.dagger)
+
     kapt(libs.google.dagger.compiler)
 
     //viewModel
@@ -115,5 +115,6 @@ dependencies {
 
     // Lifecycle Runtime
     implementation(libs.androidx.lifecycle.runtime.ktx)
+
 
 }

@@ -2,9 +2,10 @@ package com.example.recipebook.presentation.ui.categories
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.recipebook.data.util.Resource
 import com.example.recipebook.domain.model.Category
 import com.example.recipebook.domain.model.Recipe
-import com.example.recipebook.domain.usecase.GetCategoriesUseCase
+import com.example.recipebook.domain.usecase.categoryUseCase.GetCategoriesUseCase
 import com.example.recipebook.presentation.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,12 +31,15 @@ class CategoriesViewModel @Inject constructor(
     fun getCategories() {
         viewModelScope.launch {
             getCategoriesUseCase()
-                .onEach { category ->
-                    if (category == null) _state.value = UiState.Empty
-                    else _state.value = UiState.Success(category)
-                }
-                .catch { e->
-                    _state.value = UiState.Error(e.message ?: "Error loading categories")
+                .onEach { resource ->
+                    when (resource) {
+                        is Resource.Loading -> _state.value = UiState.Loading
+                        is Resource.Success -> {
+                            val data = resource.data
+                            _state.value = if (data.isNullOrEmpty()) UiState.Empty else UiState.Success(data)
+                        }
+                        is Resource.Error -> _state.value = UiState.Error(resource.message ?: "Error loading categories")
+                    }
                 }
                 .collect()
         }

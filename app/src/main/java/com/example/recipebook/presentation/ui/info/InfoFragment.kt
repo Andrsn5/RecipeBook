@@ -12,9 +12,6 @@ import com.example.recipebook.databinding.FragmentInfoBinding
 class InfoFragment : Fragment() {
 
     private var _binding: FragmentInfoBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -22,7 +19,7 @@ class InfoFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
+        _binding = FragmentInfoBinding.inflate(inflater, container, false)
         return binding.root
     }
 

@@ -1,4 +1,4 @@
-package com.example.recipebook.data.remote
+package com.example.recipebook.data.remote.recipeRemote
 
 data class RecipeDto(
     val id: String,

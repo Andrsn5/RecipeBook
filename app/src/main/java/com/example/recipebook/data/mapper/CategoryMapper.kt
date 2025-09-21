@@ -1,7 +1,7 @@
 package com.example.recipebook.data.mapper
 
-import com.example.recipebook.data.local.CategoryEntity
-import com.example.recipebook.data.local.RecipeEntity
+import com.example.recipebook.data.local.categoryLocal.CategoryEntity
+import com.example.recipebook.data.remote.categoryRemote.CategoryDto
 import com.example.recipebook.domain.model.Category
 import kotlinx.serialization.json.Json
 
@@ -21,6 +21,22 @@ object CategoryMapper {
             imageUrl = entity.imageUrl,
         )
 
+    fun dtoToEntityCategory(dto: CategoryDto): CategoryEntity =
+        CategoryEntity(
+            id = dto.id,
+            name = dto.name,
+            imageUrl = dto.imageUrl,
+        )
+
+    fun domainToEntityCategory(dto: Category): CategoryEntity =
+        CategoryEntity(
+            id = dto.id,
+            name = dto.name,
+            imageUrl = dto.imageUrl,
+        )
+
 
     fun entityListToDomainCategory(list: List<CategoryEntity>): List<Category> = list.map { entityToDomainCategory(it) }
+    fun dtoListToEntityCategory(list: List<CategoryDto>): List<CategoryEntity> = list.map { dtoToEntityCategory(it) }
+
 }

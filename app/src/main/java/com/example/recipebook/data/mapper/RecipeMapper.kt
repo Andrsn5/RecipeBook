@@ -1,9 +1,7 @@
 package com.example.recipebook.data.mapper
 
-import com.example.recipebook.data.local.CategoryEntity
-import com.example.recipebook.data.local.RecipeEntity
-import com.example.recipebook.data.remote.RecipeDto
-import com.example.recipebook.domain.model.Category
+import com.example.recipebook.data.local.recipeLocal.RecipeEntity
+import com.example.recipebook.data.remote.recipeRemote.RecipeDto
 import com.example.recipebook.domain.model.Recipe
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

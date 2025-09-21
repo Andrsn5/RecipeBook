@@ -1,16 +1,14 @@
 package com.example.recipebook.presentation.ui.home
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.recipebook.data.util.Resource
 import com.example.recipebook.domain.model.Recipe
-import com.example.recipebook.domain.usecase.GetAllRecipesUseCase
-import com.example.recipebook.domain.usecase.ToggleFavoriteUseCase
+import com.example.recipebook.domain.usecase.recipeUseCase.GetAllRecipesUseCase
+import com.example.recipebook.domain.usecase.recipeUseCase.ToggleFavoriteUseCase
 import com.example.recipebook.presentation.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -25,22 +23,21 @@ class HomeViewModel @Inject constructor(
     val state: MutableStateFlow<UiState<List<Recipe>>> = _state
 
     init {
-        loadRecipe()
+        loadRecipes()
     }
 
-    private fun loadRecipe() {
-        viewModelScope.launch{
+    private fun loadRecipes() {
+        viewModelScope.launch {
             getAllRecipesUseCase()
-                .onEach { recipes ->
-                    if (recipes.isEmpty()){
-                        _state.value = UiState.Empty
+                .onEach { resource ->
+                    when (resource) {
+                        is Resource.Loading -> _state.value = UiState.Loading
+                        is Resource.Success -> {
+                            val data = resource.data
+                            data?.let { _state.value = (if (it.isEmpty()) UiState.Empty else UiState.Success(data)) as UiState<List<Recipe>> }
+                        }
+                        is Resource.Error -> _state.value = UiState.Error(resource.message ?: "Unknown error")
                     }
-                    else{
-                        _state.value = UiState.Success(recipes)
-                    }
-                }
-                .catch { e ->
-                    _state.value = UiState.Error(e.localizedMessage ?: "Unknown error")
                 }
                 .collect()
         }

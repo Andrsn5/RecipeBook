@@ -8,9 +8,9 @@ import java.util.Locale
 
 interface RecipeRepository {
     fun getAllRecipes(): Flow<Resource<List<Recipe>>>
-    fun searchRecipes(query: String): Flow<List<Recipe>>
-    fun getRecipeById(id: String): Flow<Recipe>
-    fun getFavoriteRecipes(): Flow<List<Recipe>>
+    fun searchRecipes(query: String): Flow<Resource<List<Recipe>>>
+    fun getRecipeById(id: String): Flow<Resource<Recipe>>
+    fun getFavoriteRecipes(): Flow<Resource<List<Recipe>>>
 
     suspend fun toggleFavorite(recipeId: String)
 }
