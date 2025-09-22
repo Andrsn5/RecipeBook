@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.recipebook.databinding.FragmentFavoriteBinding
 import com.example.recipebook.presentation.adapter.RecipeAdapter
 import com.example.recipebook.presentation.ui.state.UiState
@@ -15,7 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class FavoritesFragment : Fragment() {
+class FavoriteFragment : Fragment() {
 
     private var _binding: FragmentFavoriteBinding? = null
     private val binding get() = _binding!!
@@ -32,45 +33,79 @@ class FavoritesFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupAdapter()
+        setupRecyclerView()
+        observeViewModel()
+    }
+
+    private fun setupAdapter() {
         adapter = RecipeAdapter(
             onClick = { recipe ->
-                val action =
-                    FavoritesFragmentDirections.actionFavoritesFragmentToDetailsFragment(recipe.id)
+                val action = FavoriteFragmentDirections.actionFavoritesFragmentToDetailsFragment(recipe.id)
                 findNavController().navigate(action)
             },
             onFavClick = { recipe ->
-                viewModel.toggleFavorite(recipe.id)
+                viewModel.toggleFavorite(recipe)
             }
         )
-        binding.recyclerView.adapter = adapter
+    }
 
-        lifecycleScope.launch {
-            viewModel.state.collect { state ->
+    private fun setupRecyclerView() {
+        binding.recyclerView.apply {
+            adapter = adapter
+            layoutManager = GridLayoutManager(requireContext(), 2)
+            setHasFixedSize(true)
+        }
+    }
+
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.favoritesState.collect { state ->
+                if (!isAdded) return@collect
+
                 when (state) {
                     is UiState.Loading -> {
-                        binding.progressBar.visibility = View.VISIBLE
+                        showLoading(true)
                         binding.emptyView.visibility = View.GONE
                     }
                     is UiState.Success -> {
-                        binding.progressBar.visibility = View.GONE
-                        val list = state.data ?: emptyList()
-                        if (list.isEmpty()) {
-                            binding.emptyView.visibility = View.VISIBLE
+                        showLoading(false)
+                        val favorites = state.data ?: emptyList()
+                        if (favorites.isEmpty()) {
+                            showEmptyState(true)
+                            adapter.submitList(emptyList())
                         } else {
-                            binding.emptyView.visibility = View.GONE
-                            adapter.submitList(list)
+                            showEmptyState(false)
+                            adapter.submitList(favorites)
                         }
                     }
                     is UiState.Error -> {
-                        binding.progressBar.visibility = View.GONE
+                        showLoading(false)
                         binding.emptyView.visibility = View.VISIBLE
                         binding.emptyView.text = state.message
                     }
-                    else -> {}
+                    is UiState.Empty -> {
+                        showLoading(false)
+                        showEmptyState(true)
+                    }
                 }
             }
         }
+    }
 
+    private fun showLoading(show: Boolean) {
+        binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
+    }
+
+    private fun showEmptyState(show: Boolean) {
+        binding.emptyView.visibility = if (show) View.VISIBLE else View.GONE
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Перезагружаем при возвращении на экран
         viewModel.loadFavorites()
     }
 

@@ -1,6 +1,5 @@
 package com.example.recipebook.presentation.adapter
 
-
 import com.example.recipebook.R
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -39,21 +38,36 @@ class RecipeAdapter(
         fun bind(recipe: Recipe) {
             binding.recipeTitle.text = recipe.name
 
-            // Coil для загрузки картинок
-            binding.recipeImage.load(recipe.imageUrl) {
-                crossfade(true)
-                placeholder(R.drawable.ic_launcher_background) // заглушка пока грузится
-                error(R.drawable.ic_launcher_foreground)      // если ошибка
+            // Загрузка изображения
+            if (!recipe.imageUrl.isNullOrEmpty()) {
+                binding.recipeImage.load(recipe.imageUrl) {
+                    crossfade(true)
+                    placeholder(R.drawable.ic_launcher_background)
+                    error(R.drawable.ic_launcher_foreground)
+                }
+            } else {
+                binding.recipeImage.setImageResource(R.drawable.ic_launcher_foreground)
             }
 
-            // Иконка "избранное"
+            // Обновление иконки избранного
+            updateFavoriteIcon(recipe.favourite)
+
+            binding.root.setOnClickListener {
+                onClick(recipe)
+            }
+
+            binding.favoriteButton.setOnClickListener {
+                onFavClick(recipe)
+                // Немедленное обновление иконки для лучшего UX
+                updateFavoriteIcon(!recipe.favourite)
+            }
+        }
+
+        private fun updateFavoriteIcon(isFavorite: Boolean) {
             binding.favoriteButton.setImageResource(
-                if (recipe.favourite) R.drawable.ic_favorite_selected
+                if (isFavorite) R.drawable.ic_favorite_selected
                 else R.drawable.ic_favorite_noselected
             )
-
-            binding.root.setOnClickListener { onClick(recipe) }
-            binding.favoriteButton.setOnClickListener { onFavClick(recipe) }
         }
     }
 }

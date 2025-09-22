@@ -97,8 +97,8 @@ dependencies {
 
     //Retrofit + OkHttp
     implementation(libs.retrofit)
-    implementation(libs.retrofit.kotlinx.serialization.converter)
-    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit.json)
+    implementation(libs.gson)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
 

@@ -7,12 +7,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.recipebook.R
-import com.example.recipebook.databinding.ItemCategoryBinding
+import com.example.recipebook.databinding.ItemCategoryBigBinding
 import com.example.recipebook.domain.model.Category
 
-class CategoriesAdapter(
+class CategoriesAdapterBig(
     private val onClick: (Category) -> Unit
-) : ListAdapter<Category, CategoriesAdapter.ViewHolder>(DiffCallback) {
+) : ListAdapter<Category, CategoriesAdapterBig.ViewHolder>(DiffCallback) {
 
     object DiffCallback : DiffUtil.ItemCallback<Category>() {
         override fun areItemsTheSame(oldItem: Category, newItem: Category): Boolean =
@@ -22,15 +22,15 @@ class CategoriesAdapter(
             oldItem == newItem
     }
 
-    class ViewHolder(
-        private val binding: ItemCategoryBinding,
+    inner class ViewHolder(
+        private val binding: ItemCategoryBigBinding,
         private val onClick: (Category) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(category: Category) {
             binding.categoryName.text = category.name
 
-
+            // Загружаем изображение категории
             if (!category.imageUrl.isNullOrEmpty()) {
                 binding.categoryImage.load(category.imageUrl) {
                     crossfade(true)
@@ -41,12 +41,14 @@ class CategoriesAdapter(
                 binding.categoryImage.setImageResource(R.drawable.ic_launcher_foreground)
             }
 
-            binding.root.setOnClickListener { onClick(category) }
+            binding.root.setOnClickListener {
+                onClick(category)
+            }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemCategoryBinding.inflate(
+        val binding = ItemCategoryBigBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false

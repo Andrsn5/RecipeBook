@@ -8,8 +8,8 @@ import com.example.recipebook.data.remote.recipeRemote.IngredientDto
 data class RecipeEntity(
     @PrimaryKey val id: Int,
     val title: String,
-    val imageUrl: String,
-    val description: String,
+    val imageUrl: String?,
+    val summary: String?,
     val ingredients: List<IngredientDto>,
     val isFavorite: Boolean = false
 )

@@ -13,7 +13,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.recipebook.databinding.FragmentSearchBinding
 import com.example.recipebook.presentation.adapter.RecipeAdapter
-import com.example.recipebook.presentation.ui.favorite.FavoritesFragmentDirections
 import com.example.recipebook.presentation.ui.state.UiState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

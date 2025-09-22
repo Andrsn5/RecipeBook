@@ -3,16 +3,15 @@ package com.example.recipebook.data.mapper
 import com.example.recipebook.data.local.recipeLocal.RecipeEntity
 import com.example.recipebook.data.remote.recipeRemote.RecipeDto
 import com.example.recipebook.domain.model.Recipe
-import kotlinx.serialization.json.Json
 
 object RecipeMapper {
 
     fun dtoToEntity(dto: RecipeDto): RecipeEntity =
         RecipeEntity(
             id = dto.id,
-            title = dto.title,
-            imageUrl = dto.imageUrl,
-            description = dto.description,
+            title = dto.title ?: "No Title",
+            imageUrl = dto.imageUrl ?: "", // Обработка null
+            summary = dto.summary ?: "No description", // Обработка null
             ingredients = dto.extendedIngredients ?: emptyList(),
             isFavorite = false
         )
@@ -20,9 +19,9 @@ object RecipeMapper {
     fun entityToDomain(entity: RecipeEntity): Recipe =
         Recipe(
             id = entity.id,
-            name = entity.title,
-            description = entity.description,
-            imageUrl = entity.imageUrl,
+            name = entity.title ?: "No Title",
+            summary = entity.summary ?: "No description",
+            imageUrl = entity.imageUrl ?: "",
             ingredients = entity.ingredients,
             favourite = entity.isFavorite
         )

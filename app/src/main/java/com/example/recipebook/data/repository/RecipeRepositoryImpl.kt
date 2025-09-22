@@ -25,15 +25,10 @@ class RecipeRepositoryImpl @Inject constructor(
         networkBoundResource(
             query = { dao.getAll().map { RecipeMapper.entityListToDomain(it) } },
             fetch = {
-                // Получаем случайные рецепты вместо всех
-                val response = api.getRandomRecipes(
-                    number = 20,
-                    apiKey = "401293d3dcc346729d8697c6f234f52c"
-                )
-                response.recipes // Возвращаем список рецептов из response
+                val response = api.getRandomRecipes(number = 20) // Убрали apiKey
+                response.recipes
             },
             saveFetchResult = { recipes ->
-                // Сохраняем полученные рецепты
                 dao.insertAll(recipes.map { RecipeMapper.dtoToEntity(it) })
             },
             shouldFetch = { cached -> cached.isEmpty() },

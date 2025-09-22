@@ -1,11 +1,9 @@
 package com.example.recipebook.data.remote
 
 import com.example.recipebook.data.remote.recipeRemote.RecipeDto
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.google.gson.annotations.SerializedName
 
-@Serializable
 data class RecipeResponse(
-    @SerialName("recipes")
+    @SerializedName("recipes")
     val recipes: List<RecipeDto>
 )
