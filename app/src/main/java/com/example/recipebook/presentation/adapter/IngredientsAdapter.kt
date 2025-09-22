@@ -37,7 +37,7 @@ class IngredientsAdapter(private var ingredients: List<IngredientDto>) :
         fun bind(ingredient: IngredientDto) {
             binding.productTittle.text = ingredient.name
 
-            // Загрузка изображения через Coil (если imageUrl - это URL)
+
             if (!ingredient.imageUrl.isNullOrEmpty()) {
                 if (ingredient.imageUrl.startsWith("http")) {
                     binding.productImage.load(ingredient.imageUrl) {
@@ -46,7 +46,6 @@ class IngredientsAdapter(private var ingredients: List<IngredientDto>) :
                         error(R.drawable.ic_launcher_foreground)
                     }
                 } else {
-                    // Если imageUrl - это resource ID в виде строки
                     val imageResourceId = ingredient.imageUrl.toIntOrNull() ?: 0
                     if (imageResourceId != 0) {
                         binding.productImage.setImageResource(imageResourceId)

@@ -42,29 +42,26 @@ class CategoriesFragment : Fragment() {
 
         Log.d(TAG, "onViewCreated: Fragment created")
 
-        // ВАЖНО: сначала настраиваем адаптер и RecyclerView
+
         setupAdapter()
         setupRecyclerView()
 
-        // Затем наблюдаем за данными
+
         observeViewModel()
     }
 
     private fun setupAdapter() {
         adapter = CategoriesAdapterBig { category ->
-            Log.d(TAG, "Category clicked: ${category.name}")
             viewModel.onCategorySelected(category)
         }
     }
 
     private fun setupRecyclerView() {
         binding.recyclerView.apply {
-            // ВАЖНО: устанавливаем адаптер ДО установки layout manager
             adapter = this@CategoriesFragment.adapter
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
         }
-        Log.d(TAG, "RecyclerView setup completed")
     }
 
     private fun observeViewModel() {
@@ -72,22 +69,18 @@ class CategoriesFragment : Fragment() {
             viewModel.categoriesState.collectLatest { state ->
                 if (!isAdded) return@collectLatest
 
-                Log.d(TAG, "State changed: $state")
 
                 when (state) {
                     is UiState.Loading -> {
-                        Log.d(TAG, "Loading state")
                         binding.progressBar.visibility = View.VISIBLE
                         binding.emptyView.visibility = View.GONE
                         binding.recyclerView.visibility = View.GONE
                     }
                     is UiState.Success -> {
-                        Log.d(TAG, "Success state, data: ${state.data?.size} items")
                         binding.progressBar.visibility = View.GONE
                         val categories = state.data ?: emptyList()
 
                         if (categories.isEmpty()) {
-                            Log.d(TAG, "No categories found")
                             binding.emptyView.visibility = View.VISIBLE
                             binding.recyclerView.visibility = View.GONE
                         } else {
@@ -95,9 +88,7 @@ class CategoriesFragment : Fragment() {
                             binding.emptyView.visibility = View.GONE
                             binding.recyclerView.visibility = View.VISIBLE
 
-                            // ВАЖНО: убедимся, что адаптер установлен перед submitList
                             if (binding.recyclerView.adapter == null) {
-                                Log.e(TAG, "Adapter is null! Re-setting adapter")
                                 binding.recyclerView.adapter = adapter
                             }
 
@@ -105,14 +96,12 @@ class CategoriesFragment : Fragment() {
                         }
                     }
                     is UiState.Error -> {
-                        Log.e(TAG, "Error state: ${state.message}")
                         binding.progressBar.visibility = View.GONE
                         binding.emptyView.visibility = View.VISIBLE
                         binding.recyclerView.visibility = View.GONE
                         binding.emptyView.text = state.message ?: "Произошла ошибка"
                     }
                     is UiState.Empty -> {
-                        Log.d(TAG, "Empty state")
                         binding.progressBar.visibility = View.GONE
                         binding.emptyView.visibility = View.VISIBLE
                         binding.recyclerView.visibility = View.GONE
@@ -124,8 +113,6 @@ class CategoriesFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        Log.d(TAG, "onResume: Refreshing categories")
-        // Данные уже загружаются в init ViewModel, поэтому не нужно вызывать повторно
     }
 
     override fun onDestroyView() {

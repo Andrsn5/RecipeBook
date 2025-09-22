@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.recipebook.data.util.Resource
 import com.example.recipebook.domain.model.Recipe
-import com.example.recipebook.domain.usecase.recipeUseCase.GetFavoritesUseCase
+import com.example.recipebook.domain.usecase.recipeUseCase.GetAllRecipesUseCase
 import com.example.recipebook.domain.usecase.recipeUseCase.ToggleFavoriteUseCase
 import com.example.recipebook.presentation.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,24 +15,34 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FavoriteViewModel @Inject constructor(
-    private val getFavoritesUseCase: GetFavoritesUseCase,
+    private val getAllRecipesUseCase: GetAllRecipesUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase
 ) : ViewModel() {
 
     private val _favoritesState = MutableStateFlow<UiState<List<Recipe>>>(UiState.Loading)
     val favoritesState = _favoritesState.asStateFlow()
 
-    init {
-        loadFavorites()
-    }
+
+
+
 
     fun loadFavorites() {
         viewModelScope.launch {
-            getFavoritesUseCase().collect { resource ->
+            getAllRecipesUseCase().collect { resource ->
+
                 when (resource) {
-                    is Resource.Loading -> _favoritesState.value = UiState.Loading
+                    is Resource.Loading -> {
+                        _favoritesState.value = UiState.Loading
+                    }
                     is Resource.Success -> {
-                        val favorites = resource.data ?: emptyList()
+                        val allRecipes = resource.data ?: emptyList()
+
+                        allRecipes.forEachIndexed { index, recipe ->
+                        }
+                        val favorites = allRecipes.filter { it.favourite }
+                        favorites.forEachIndexed { index, recipe ->
+                        }
+
                         _favoritesState.value = if (favorites.isEmpty()) {
                             UiState.Empty
                         } else {
@@ -40,7 +50,7 @@ class FavoriteViewModel @Inject constructor(
                         }
                     }
                     is Resource.Error -> {
-                        _favoritesState.value = UiState.Error(resource.message ?: "Ошибка загрузки избранного")
+                        _favoritesState.value = UiState.Error(resource.message ?: "Ошибка загрузки")
                     }
                 }
             }
@@ -50,7 +60,8 @@ class FavoriteViewModel @Inject constructor(
     fun toggleFavorite(recipe: Recipe) {
         viewModelScope.launch {
             toggleFavoriteUseCase(recipe.id)
-            // Перезагружаем список после изменения
+
+            kotlinx.coroutines.delay(300)
             loadFavorites()
         }
     }

@@ -10,8 +10,8 @@ object RecipeMapper {
         RecipeEntity(
             id = dto.id,
             title = dto.title ?: "No Title",
-            imageUrl = dto.imageUrl ?: "", // Обработка null
-            summary = dto.summary ?: "No description", // Обработка null
+            imageUrl = dto.imageUrl ?: "",
+            summary = dto.summary ?: "No description",
             ingredients = dto.extendedIngredients ?: emptyList(),
             isFavorite = false
         )

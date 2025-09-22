@@ -75,8 +75,7 @@ class HomeViewModel @Inject constructor(
 
     fun onCategorySelected(category: Category) {
         _selectedCategoryId = category.id
-        // Здесь можно добавить фильтрацию рецептов по категории
-        loadRecipes() // Перезагружаем рецепты с учетом выбранной категории
+        loadRecipes()
     }
 
     fun onFavouriteClick(recipe: Recipe) {

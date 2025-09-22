@@ -1,6 +1,7 @@
 package com.example.recipebook.data.repository
 
 
+import android.util.Log
 import com.example.recipebook.data.local.recipeLocal.RecipeDao
 import com.example.recipebook.data.mapper.RecipeMapper
 import com.example.recipebook.data.remote.recipeRemote.RecipeApi
@@ -25,7 +26,7 @@ class RecipeRepositoryImpl @Inject constructor(
         networkBoundResource(
             query = { dao.getAll().map { RecipeMapper.entityListToDomain(it) } },
             fetch = {
-                val response = api.getRandomRecipes(number = 20) // Убрали apiKey
+                val response = api.getRandomRecipes(number = 20)
                 response.recipes
             },
             saveFetchResult = { recipes ->
@@ -81,9 +82,18 @@ class RecipeRepositoryImpl @Inject constructor(
         }
 
     override suspend fun toggleFavorite(recipeId: Int) {
-        val recipe = dao.getById(recipeId).first()
-        recipe?.let {
-            dao.updateFavorite(recipeId, !it.isFavorite)
+        try {
+            val recipe = dao.getById(recipeId).first()
+            recipe?.let {
+                val newFavoriteState = !it.isFavorite
+                dao.updateFavorite(recipeId, newFavoriteState)
+
+                val updatedRecipe = dao.getById(recipeId).first()
+            } ?: run {
+                Log.e("RecipeRepositoryImpl", "Recipe with id $recipeId not found in DB")
+            }
+        } catch (e: Exception) {
+            Log.e("RecipeRepositoryImpl", "Error toggling favorite: ${e.message}")
         }
     }
 }

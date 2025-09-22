@@ -25,7 +25,6 @@ class DetailsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val args: DetailsFragmentArgs by navArgs()
-
     private lateinit var adapter: IngredientsAdapter
     private val viewModel: DetailsViewModel by viewModels()
 
@@ -44,7 +43,6 @@ class DetailsFragment : Fragment() {
         setupClickListeners()
         observeViewModel()
 
-        // Загружаем данные рецепта
         viewModel.loadRecipe(args.recipeId)
     }
 
@@ -61,8 +59,6 @@ class DetailsFragment : Fragment() {
         binding.favoriteButton.setOnClickListener {
             viewModel.currentRecipe?.let { recipe ->
                 viewModel.toggleFavorite(recipe.id)
-                // Немедленное обновление иконки для лучшего UX
-                updateFavoriteIcon(!recipe.favourite)
             }
         }
     }
@@ -70,12 +66,10 @@ class DetailsFragment : Fragment() {
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.state.collect { state ->
-                if (!isAdded) return@collect
+                if (!isAdded || _binding == null) return@collect
 
                 when (state) {
-                    is UiState.Loading -> {
-                        showLoading(true)
-                    }
+                    is UiState.Loading -> showLoading(true)
                     is UiState.Success -> {
                         showLoading(false)
                         state.data?.let { recipe ->
@@ -96,7 +90,8 @@ class DetailsFragment : Fragment() {
     }
 
     private fun displayRecipe(recipe: Recipe) {
-        // Загрузка изображения
+        if (!isAdded || _binding == null) return // Защита от NPE
+
         if (!recipe.imageUrl.isNullOrEmpty()) {
             binding.recipeImage.load(recipe.imageUrl) {
                 crossfade(true)
@@ -107,21 +102,15 @@ class DetailsFragment : Fragment() {
             binding.recipeImage.setImageResource(R.drawable.ic_launcher_foreground)
         }
 
-        // Установка текстовой информации
         binding.recipeTitle.text = recipe.name
         binding.recipeDescription.text = recipe.summary ?: "Описание отсутствует"
-
-        // Обновление иконки избранного
         updateFavoriteIcon(recipe.favourite)
-
-        // Обновление списка ингредиентов
         adapter.updateData(recipe.ingredients)
-
-        // Сохраняем текущий рецепт во ViewModel для использования в кликах
         viewModel.setCurrentRecipe(recipe)
     }
 
     private fun updateFavoriteIcon(isFavorite: Boolean) {
+        if (!isAdded || _binding == null) return
         binding.favoriteButton.setImageResource(
             if (isFavorite) R.drawable.ic_favorite_selected
             else R.drawable.ic_favorite_noselected
@@ -129,10 +118,12 @@ class DetailsFragment : Fragment() {
     }
 
     private fun showLoading(show: Boolean) {
+        if (!isAdded || _binding == null) return
         binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
     }
 
     private fun showError(message: String) {
+        if (!isAdded || _binding == null) return
         binding.recipeTitle.text = "Ошибка"
         binding.recipeDescription.text = message
     }

@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
-    // Это свойство должно быть доступно только между onCreateView и onDestroyView
+
     private val binding get() = _binding!!
 
     private val viewModel: HomeViewModel by viewModels()
@@ -44,7 +44,7 @@ class HomeFragment : Fragment() {
         observeViewModel()
         setupClickListeners()
 
-        // Загрузка данных
+
         viewModel.loadCategories()
         viewModel.loadRecipes()
     }
@@ -66,7 +66,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupRecyclerViews() {
-        // Настройка RecyclerView для категорий (горизонтальный)
+
         binding.categoriesRecyclerView.apply {
             adapter = categoriesAdapter
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
@@ -77,7 +77,7 @@ class HomeFragment : Fragment() {
             setHasFixedSize(true)
         }
 
-        // Настройка RecyclerView для рецептов (сетка 2 колонки)
+
         binding.recipesRecyclerView.apply {
             adapter = recipesAdapter
             layoutManager = GridLayoutManager(context, 2)
@@ -86,31 +86,31 @@ class HomeFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        // Наблюдаем за категориями с учетом жизненного цикла View
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.categoriesState.collectLatest { state ->
-                if (!isAdded) return@collectLatest // Проверяем, что фрагмент присоединен к Activity
+                if (!isAdded) return@collectLatest
 
                 when (state) {
                     is UiState.Loading -> {
-                        // Можно показать прогресс для категорий если нужно
+
                     }
                     is UiState.Success -> {
                         val categories = state.data ?: emptyList()
                         categoriesAdapter.submitList(categories)
                     }
                     is UiState.Error -> {
-                        // Обработка ошибки для категорий
+
                     }
                     else -> {}
                 }
             }
         }
 
-        // Наблюдаем за рецептами с учетом жизненного цикла View
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.recipesState.collectLatest { state ->
-                if (!isAdded) return@collectLatest // Проверяем, что фрагмент присоединен к Activity
+                if (!isAdded) return@collectLatest
 
                 when (state) {
                     is UiState.Loading -> {
@@ -140,14 +140,12 @@ class HomeFragment : Fragment() {
 
     private fun setupClickListeners() {
         binding.searchButton.setOnClickListener {
-            // Навигация к поиску
             findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToSearchFragment())
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // Важно: обнуляем binding при уничтожении View
         _binding = null
     }
 }

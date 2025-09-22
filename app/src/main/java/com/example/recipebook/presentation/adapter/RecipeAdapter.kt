@@ -38,7 +38,7 @@ class RecipeAdapter(
         fun bind(recipe: Recipe) {
             binding.recipeTitle.text = recipe.name
 
-            // Загрузка изображения
+
             if (!recipe.imageUrl.isNullOrEmpty()) {
                 binding.recipeImage.load(recipe.imageUrl) {
                     crossfade(true)
@@ -49,7 +49,6 @@ class RecipeAdapter(
                 binding.recipeImage.setImageResource(R.drawable.ic_launcher_foreground)
             }
 
-            // Обновление иконки избранного
             updateFavoriteIcon(recipe.favourite)
 
             binding.root.setOnClickListener {
@@ -58,7 +57,6 @@ class RecipeAdapter(
 
             binding.favoriteButton.setOnClickListener {
                 onFavClick(recipe)
-                // Немедленное обновление иконки для лучшего UX
                 updateFavoriteIcon(!recipe.favourite)
             }
         }

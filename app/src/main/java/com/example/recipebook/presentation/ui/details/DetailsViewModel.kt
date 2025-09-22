@@ -54,8 +54,7 @@ class DetailsViewModel @Inject constructor(
     fun toggleFavorite(id: Int) {
         viewModelScope.launch {
             toggleFavoriteUseCase(id)
-            // После изменения избранного перезагружаем рецепт для обновления состояния
-            currentRecipe?.let { loadRecipe(it.id) }
+            loadRecipe(id)
         }
     }
 }

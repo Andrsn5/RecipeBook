@@ -52,7 +52,5 @@ class CategoriesViewModel @Inject constructor(
     }
     fun onCategorySelected(category: Category) {
         _selectedCategoryId = category.id
-        // Здесь можно добавить фильтрацию рецептов по категории
-
     }
 }

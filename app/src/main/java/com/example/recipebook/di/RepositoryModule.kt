@@ -24,7 +24,7 @@ object RepositoryModule {
     @Singleton
     fun provideNetworkMonitor(@ApplicationContext context: Context): NetworkMonitor {
         return NetworkMonitor(context).apply {
-            register() // Регистрируем здесь
+            register()
         }
     }
 

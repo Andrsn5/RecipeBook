@@ -24,6 +24,7 @@ class FavoriteFragment : Fragment() {
     private val viewModel: FavoriteViewModel by viewModels()
     private lateinit var adapter: RecipeAdapter
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,8 +36,12 @@ class FavoriteFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+
         setupAdapter()
         setupRecyclerView()
+
+
         observeViewModel()
     }
 
@@ -50,13 +55,18 @@ class FavoriteFragment : Fragment() {
                 viewModel.toggleFavorite(recipe)
             }
         )
+
     }
 
     private fun setupRecyclerView() {
+
         binding.recyclerView.apply {
-            adapter = adapter
+            // ВАЖНО: убедимся, что адаптер установлен
+            adapter = this@FavoriteFragment.adapter
             layoutManager = GridLayoutManager(requireContext(), 2)
             setHasFixedSize(true)
+
+            setBackgroundColor(0x10FF0000)
         }
     }
 
@@ -69,26 +79,33 @@ class FavoriteFragment : Fragment() {
                     is UiState.Loading -> {
                         showLoading(true)
                         binding.emptyView.visibility = View.GONE
+                        binding.recyclerView.visibility = View.GONE
                     }
                     is UiState.Success -> {
                         showLoading(false)
                         val favorites = state.data ?: emptyList()
+
                         if (favorites.isEmpty()) {
                             showEmptyState(true)
+                            binding.recyclerView.visibility = View.GONE
                             adapter.submitList(emptyList())
                         } else {
                             showEmptyState(false)
+                            binding.recyclerView.visibility = View.VISIBLE
                             adapter.submitList(favorites)
+
                         }
                     }
                     is UiState.Error -> {
                         showLoading(false)
                         binding.emptyView.visibility = View.VISIBLE
-                        binding.emptyView.text = state.message
+                        binding.recyclerView.visibility = View.GONE
+                        binding.emptyView.text = state.message ?: "Произошла ошибка"
                     }
                     is UiState.Empty -> {
                         showLoading(false)
                         showEmptyState(true)
+                        binding.recyclerView.visibility = View.GONE
                     }
                 }
             }
@@ -105,8 +122,6 @@ class FavoriteFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // Перезагружаем при возвращении на экран
-        viewModel.loadFavorites()
     }
 
     override fun onDestroyView() {
