@@ -1,3 +1,3 @@
 package com.example.recipebook.domain.model
 
-data class Category( val id: String, val name: String,  val imageUrl: String)
+data class Category( val id: Int, val name: String,  val imageUrl: String)

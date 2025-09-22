@@ -1,23 +1,21 @@
 package com.example.recipebook.data.util
 
 import androidx.room.TypeConverter
-import kotlinx.serialization.SerializationStrategy
+import com.example.recipebook.data.remote.recipeRemote.IngredientDto
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class Converters {
 
     @TypeConverter
-    fun fromList(list: List<String>): String {
-        return Json.encodeToString(
-            serializer = list as SerializationStrategy<Nothing>,
-            value = TODO()
-        )
+    fun fromIngredientList(list: List<IngredientDto>): String {
+        return Json.encodeToString(list)
     }
 
     @TypeConverter
-    fun toList(jsonString: String): List<String> {
+    fun toIngredientList(jsonString: String): List<IngredientDto> {
         return try {
-            Json.decodeFromString(jsonString)
+            Json.decodeFromString<List<IngredientDto>>(jsonString)
         } catch (e: Exception) {
             emptyList()
         }

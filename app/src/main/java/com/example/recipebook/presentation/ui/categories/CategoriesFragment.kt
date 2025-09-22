@@ -34,10 +34,11 @@ class CategoriesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         adapter = CategoriesAdapter { category ->
             val action =
-                CategoriesFragmentDirections.actionCategoriesFragmentToHomeFragment(category)
+                CategoriesFragmentDirections.actionCategoriesFragmentToHomeFragment(category.id)
             findNavController().navigate(action)
         }
         binding.recyclerView.adapter = adapter
+
 
         lifecycleScope.launch {
             viewModel.state.collect { state ->

@@ -26,7 +26,7 @@ class HomeViewModel @Inject constructor(
         loadRecipes()
     }
 
-    private fun loadRecipes() {
+    fun loadRecipes() {
         viewModelScope.launch {
             getAllRecipesUseCase()
                 .onEach { resource ->
@@ -34,7 +34,11 @@ class HomeViewModel @Inject constructor(
                         is Resource.Loading -> _state.value = UiState.Loading
                         is Resource.Success -> {
                             val data = resource.data
-                            data?.let { _state.value = (if (it.isEmpty()) UiState.Empty else UiState.Success(data)) as UiState<List<Recipe>> }
+                            if (data.isNullOrEmpty()) {
+                                _state.value = UiState.Empty
+                            } else {
+                                _state.value = UiState.Success(data)
+                            }
                         }
                         is Resource.Error -> _state.value = UiState.Error(resource.message ?: "Unknown error")
                     }
@@ -43,7 +47,15 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun toggleFavorite(id: String){
+    private var currentCategory: String? = null
+
+
+    fun filterByCategory(category: String) {
+        currentCategory = category
+        loadRecipes()
+    }
+
+    fun toggleFavorite(id: Int){
         viewModelScope.launch {
             toggleFavoriteUseCase(id)
         }

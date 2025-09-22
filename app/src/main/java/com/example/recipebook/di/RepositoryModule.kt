@@ -3,7 +3,6 @@ package com.example.recipebook.di
 import android.content.Context
 import com.example.recipebook.data.local.categoryLocal.CategoryDao
 import com.example.recipebook.data.local.recipeLocal.RecipeDao
-import com.example.recipebook.data.remote.categoryRemote.CategoryApi
 import com.example.recipebook.data.remote.recipeRemote.RecipeApi
 import com.example.recipebook.data.repository.CategoryRepositoryImpl
 import com.example.recipebook.data.repository.RecipeRepositoryImpl
@@ -24,7 +23,9 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideNetworkMonitor(@ApplicationContext context: Context): NetworkMonitor {
-        return NetworkMonitor(context)
+        return NetworkMonitor(context).apply {
+            register() // Регистрируем здесь
+        }
     }
 
     @Provides
@@ -40,10 +41,8 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideCategoryRepository(
-        api: CategoryApi,
         dao: CategoryDao,
-        networkMonitor: NetworkMonitor
     ): CategoryRepository {
-        return CategoryRepositoryImpl(api, dao,networkMonitor)
+        return CategoryRepositoryImpl(dao)
     }
 }

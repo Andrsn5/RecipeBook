@@ -1,7 +1,7 @@
 package com.example.recipebook.di
 
 
-import com.example.recipebook.data.remote.categoryRemote.CategoryApi
+
 import com.example.recipebook.data.remote.recipeRemote.RecipeApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
@@ -69,12 +69,6 @@ object NetworkModule {
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory(JSON_CONTENT_TYPE))
             .build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideCategoryApi(retrofit: Retrofit): CategoryApi {
-        return retrofit.create(CategoryApi::class.java)
     }
 
 

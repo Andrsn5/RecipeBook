@@ -9,5 +9,5 @@ import javax.inject.Inject
 class GetRecipeDetailsUseCase @Inject constructor(
     private val repository: RecipeRepository
 ) {
-    operator fun invoke(id: String): Flow<Resource<Recipe>> = repository.getRecipeById(id)
+    operator fun invoke(id: Int): Flow<Resource<Recipe>> = repository.getRecipeById(id)
 }

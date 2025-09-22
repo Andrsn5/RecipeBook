@@ -1,13 +1,19 @@
 package com.example.recipebook.data.remote.recipeRemote
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class RecipeDto(
-    val id: String,
+    val id: Int,
     val title: String,
-    val imageUrl: String,
-    val category: String,
-    val description: String,
-    val ingredients: List<String>,
-    val ingredientsImage: List<String>,
-    val isFavorite: Boolean = false,
-    val lastUpdate: Long = 0
+    @SerialName("image") val imageUrl: String,
+    val description: String, // ← не description!
+    val extendedIngredients: List<IngredientDto> //
+)
+
+@Serializable
+data class IngredientDto(
+    val name: String,
+    @SerialName("image") val imageUrl: String
 )

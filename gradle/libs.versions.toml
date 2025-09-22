@@ -1,6 +1,6 @@
 [versions]
 agp = "8.6.1"
-kotlin = "1.9.0"
+kotlin = "2.0.0"
 coreKtx = "1.16.0"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -13,12 +13,12 @@ navigationFragmentKtx = "2.8.9"
 navigationUiKtx = "2.8.9"
 junit = "4.13.2"
 
-dataStore="1.1.1"
-roomCommonJvm = "2.7.0"
-room = "2.6.1"
-hilt-version = "2.48"
+dataStore="1.1.7"
+roomCommonJvm = "2.8.0"
+room = "2.8.0"
+hilt-version = "2.57.1"
 fragment = "1.6.2"
-nav = "2.7.4"
+nav = "2.5.3"
 retVersion = "2.11.0"
 okhVersion = "4.12.0"
 coilVersion = "2.7.0"
@@ -26,8 +26,7 @@ coroutineVersion = "1.9.0"
 lifecycle = "2.8.6"
 kotlinx-serialization = "1.6.0"
 retrofit-kotlinx-serialization-converter = "1.0.0"
-transportRuntime = "4.0.0"
-roomCompilerProcessingTesting = "2.8.0"
+
 
 
 

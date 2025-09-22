@@ -23,7 +23,7 @@ class DetailsViewModel @Inject constructor(
     private val _state = MutableStateFlow<UiState<Recipe>>(UiState.Loading)
     val state:MutableStateFlow<UiState<Recipe>> = _state
 
-    fun loadRecipe(id: String) {
+    fun loadRecipe(id: Int) {
         viewModelScope.launch {
             getRecipeDetailsUseCase(id)
                 .onEach { resource ->
@@ -40,7 +40,9 @@ class DetailsViewModel @Inject constructor(
         }
     }
 
-    fun toggleFavorite(id: String){
+
+
+    fun toggleFavorite(id: Int){
         viewModelScope.launch {
             toggleFavoriteUseCase(id)
         }

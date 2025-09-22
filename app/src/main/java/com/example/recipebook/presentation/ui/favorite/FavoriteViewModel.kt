@@ -35,7 +35,7 @@ class FavoriteViewModel @Inject constructor(
                         is Resource.Loading -> _state.value = UiState.Loading
                         is Resource.Success -> {
                             val data = resource.data
-                            data?.let { _state.value = (if (it.isEmpty()) UiState.Empty else UiState.Success(data)) as UiState<List<Recipe>> }
+                            data?.let { _state.value = (if (it.isEmpty()) UiState.Empty else UiState.Success(data))  }
                         }
                         is Resource.Error -> _state.value = UiState.Error(resource.message ?: "Error loading favorites")
                     }
@@ -43,9 +43,10 @@ class FavoriteViewModel @Inject constructor(
                 .collect()
         }
     }
-    fun toggleFavorite(id: String){
+    fun toggleFavorite(id: Int){
         viewModelScope.launch {
             toggleFavoriteUseCase(id)
+            loadFavorites()
         }
     }
 

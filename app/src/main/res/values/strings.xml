@@ -14,5 +14,6 @@
     <string name="search">Search</string>
     <string name="menu_categories">Categories</string>
     <string name="description">Description</string>
+    <string name="message">Send Message to Developer</string>
 
 </resources>

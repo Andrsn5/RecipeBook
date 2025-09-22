@@ -4,6 +4,7 @@ plugins {
     kotlin("kapt")
     alias(libs.plugins.google.dagger)
     alias(libs.plugins.androidx.navigation)
+
 }
 
 android {
@@ -23,19 +24,11 @@ android {
             abiFilters.addAll(listOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a"))
         }
         //noinspection WrongGradleMethod
-        hilt {
-            enableAggregatingTask = false
-        }
+
+
     }
 
-    configurations.all {
-        resolutionStrategy {
-            force("org.jetbrains.kotlin:kotlin-stdlib:1.9.0")
-            force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0")
-            force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")
-            force("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
-        }
-    }
+
 
     buildTypes {
         release {
@@ -61,6 +54,9 @@ android {
             force("com.squareup:javapoet:1.13.0")
 
         }
+    }
+    hilt {
+        enableAggregatingTask = false
     }
 }
 
@@ -94,7 +90,6 @@ dependencies {
 
     //Hilt
     implementation(libs.google.dagger)
-
     kapt(libs.google.dagger.compiler)
 
     //viewModel
@@ -115,6 +110,6 @@ dependencies {
 
     // Lifecycle Runtime
     implementation(libs.androidx.lifecycle.runtime.ktx)
-
+    implementation("com.squareup:javapoet:1.13.0")
 
 }

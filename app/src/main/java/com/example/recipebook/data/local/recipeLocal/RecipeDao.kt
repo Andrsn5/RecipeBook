@@ -12,7 +12,7 @@ interface RecipeDao {
     fun getAll(): Flow<List<RecipeEntity>>
 
     @Query("SELECT * FROM recipes WHERE id = :id LIMIT 1")
-    fun getById(id: String): Flow<RecipeEntity?>
+    fun getById(id: Int): Flow<RecipeEntity?>
 
     @Query("SELECT * FROM recipes WHERE title LIKE '%' || :query || '%' ORDER BY title ASC")
     fun search(query: String): Flow<List<RecipeEntity>>
@@ -25,8 +25,5 @@ interface RecipeDao {
     suspend fun insertAll(recipes: List<RecipeEntity>)
 
     @Query("UPDATE recipes SET isFavorite = :isFavorite WHERE id = :id")
-    suspend fun updateFavorite(id: String, isFavorite: Boolean)
-
-    @Query("DELETE FROM recipes WHERE lastUpdate < :threshold")
-    suspend fun deleteOld(threshold: Long)
+    suspend fun updateFavorite(id: Int, isFavorite: Boolean)
 }

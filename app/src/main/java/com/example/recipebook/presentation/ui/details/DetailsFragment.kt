@@ -22,7 +22,6 @@ class DetailsFragment: Fragment() {
     private var _binding: FragmentDetailsBinding? = null
     private val binding get() = _binding!!
 
-
     private lateinit var adapter: IngredientsAdapter
     private val viewModel: DetailsViewModel by viewModels()
 
@@ -35,15 +34,14 @@ class DetailsFragment: Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val recipeId = arguments?.getLong("recipeId").toString() ?: return
+        val recipeId = arguments?.getInt("recipeId") ?: return
 
-        viewModel.loadRecipe(recipeId)
+        adapter = IngredientsAdapter(emptyList())
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerView.adapter = adapter
+
 
         lifecycleScope.launch {
-
-            binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-            binding.recyclerView.adapter = adapter
-
             viewModel.state.collect { state ->
                 when (state) {
                     is UiState.Loading -> {
@@ -52,21 +50,24 @@ class DetailsFragment: Fragment() {
                     is UiState.Success -> {
                         binding.progressBar.visibility = View.GONE
                         val recipe = state.data
-                        if (recipe != null) {
-                            binding.recipeImage.load(recipe.imageUrl) {
-                                placeholder(R.drawable.side_nav_bar)
+                        recipe?.let {
+                            binding.recipeImage.load(it.imageUrl) {
+                                crossfade(true)
+                                placeholder(R.drawable.ic_launcher_background)
+                                error(R.drawable.ic_launcher_foreground)
                             }
-                            binding.recipeTitle.text = recipe.name
-                            binding.recipeCategory.text = recipe.category ?: ""
-                            binding.recipeDescription.text = recipe.description ?: ""
+                            binding.recipeTitle.text = it.name
+                            binding.recipeDescription.text = it.description ?: ""
+
                             binding.favoriteButton.setImageResource(
-                                if (recipe.favourite) R.drawable.ic_favorite_selected
+                                if (it.favourite) R.drawable.ic_favorite_selected
                                 else R.drawable.ic_favorite_noselected
                             )
                             binding.favoriteButton.setOnClickListener {
                                 viewModel.toggleFavorite(recipe.id)
                             }
-                            adapter = IngredientsAdapter(recipe.ingredients,recipe.ingredientsImagine)
+
+                            adapter.updateData(recipe.ingredients)
                         }
                     }
                     is UiState.Error -> {
@@ -77,6 +78,7 @@ class DetailsFragment: Fragment() {
                 }
             }
         }
+        viewModel.loadRecipe(recipeId)
     }
 
     override fun onDestroyView() {

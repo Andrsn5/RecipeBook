@@ -1,17 +1,23 @@
 package com.example.recipebook.presentation.ui.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.recipebook.R
+import com.example.recipebook.RecipeApplication
 import com.example.recipebook.databinding.FragmentHomeBinding
+import com.example.recipebook.presentation.adapter.CategoriesAdapter
 import com.example.recipebook.presentation.adapter.RecipeAdapter
-import com.example.recipebook.presentation.ui.favorite.FavoritesFragmentDirections
+import com.example.recipebook.presentation.ui.categories.CategoriesViewModel
 import com.example.recipebook.presentation.ui.state.UiState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -22,8 +28,10 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: HomeViewModel by viewModels()
-    private lateinit var adapter: RecipeAdapter
+    private val viewModelRecipe: HomeViewModel by viewModels()
+    private val viewModelCategory : CategoriesViewModel by viewModels()
+    private lateinit var categoriesAdapter: CategoriesAdapter
+    private lateinit var recipesAdapter: RecipeAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,51 +39,77 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        val root: View = binding.root
-
-        return root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        adapter = RecipeAdapter(
+
+        viewModelRecipe.loadRecipes()
+        viewModelCategory.getCategories()
+
+
+
+        binding.searchButton.setOnClickListener {
+            val action = HomeFragmentDirections.actionHomeFragmentToSearchFragment()
+            findNavController().navigate(action)
+        }
+
+        recipesAdapter = RecipeAdapter(
             onClick = { recipe ->
-                val action =
-                    HomeFragmentDirections.actionHomeFragmentToDetailsFragment(recipe.id)
+                val action = HomeFragmentDirections.actionHomeFragmentToDetailsFragment(recipe.id)
                 findNavController().navigate(action)
             },
-            onFavClick = { recipe ->
-                viewModel.toggleFavorite(recipe.id)
-            }
+            onFavClick = { recipe -> viewModelRecipe.toggleFavorite(recipe.id) }
         )
-        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        binding.recyclerView.adapter = adapter
-        
-        lifecycleScope.launch { 
-            viewModel.state.collect { state ->
-                when(state) {
-                    is UiState.Loading -> binding.progressBar.visibility = View.VISIBLE
+
+        binding.recipesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.recipesRecyclerView.adapter = recipesAdapter
+
+
+        categoriesAdapter = CategoriesAdapter { category ->
+            viewModelRecipe.filterByCategory(category.name)
+        }
+
+        binding.categoriesRecyclerView.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.categoriesRecyclerView.adapter = categoriesAdapter
+
+
+        lifecycleScope.launch {
+            viewModelRecipe.state.collect { state ->
+                when (state) {
+                    is UiState.Loading -> {
+                        binding.progressBar.visibility = View.VISIBLE
+                    }
                     is UiState.Success -> {
                         binding.progressBar.visibility = View.GONE
-                        adapter.submitList(state.data)
+                        recipesAdapter.submitList(state.data)
+                        Log.d("HomeFragment", "success: ${state}")
                     }
                     is UiState.Error -> {
                         binding.progressBar.visibility = View.GONE
-                        binding.emptyText.text = state.message
-                        binding.emptyText.visibility = View.VISIBLE
+                        Log.d("HomeFragment", "Error: ${state.message}")
                     }
-                    is UiState.Empty -> {
-                        binding.progressBar.visibility = View.GONE
-                        binding.emptyText.text = "Нет рецептов"
-                        binding.emptyText.visibility = View.VISIBLE
-                    }
+                    else -> {}
                 }
             }
         }
-        super.onViewCreated(view, savedInstanceState)
+
+        lifecycleScope.launch {
+            viewModelCategory.state.collect { state ->
+                if (state is UiState.Success) {
+                    categoriesAdapter.submitList(state.data)
+                }
+            }
+        }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 }
+
+
+

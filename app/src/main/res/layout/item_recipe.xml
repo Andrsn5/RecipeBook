@@ -1,37 +1,41 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="300dp"
-    android:orientation="vertical"
-    android:padding="8dp">
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="6dp">
 
-    <ImageView
-        android:id="@+id/recipeImage"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:scaleType="centerCrop"/>
-
-    <TextView
-        android:id="@+id/recipeTitle"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_weight="1"
-        android:textSize="18sp"/>
+        android:orientation="vertical"
+        android:padding="8dp">
 
-    <ImageButton
-        android:id="@+id/favoriteButton"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@drawable/ic_favorite_noselected"
-        android:contentDescription="Добавить в избранное"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:layout_gravity="end"
-        android:padding="8dp"
-        />
+        <ImageView
+            android:id="@+id/recipeImage"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/app_name" />
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/recipeTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/favoriteButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_favorite_noselected"
+            android:contentDescription="@string/menu_favorite"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_gravity="end"
+            app:tint="@color/purple_500" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

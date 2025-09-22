@@ -28,7 +28,7 @@ class RecipeRepositoryImpl @Inject constructor(
                 // Получаем случайные рецепты вместо всех
                 val response = api.getRandomRecipes(
                     number = 20,
-                    apiKey = TODO()
+                    apiKey = "401293d3dcc346729d8697c6f234f52c"
                 )
                 response.recipes // Возвращаем список рецептов из response
             },
@@ -54,7 +54,7 @@ class RecipeRepositoryImpl @Inject constructor(
             }
         }
 
-    override fun getRecipeById(id: String): Flow<Resource<Recipe>> =
+    override fun getRecipeById(id: Int): Flow<Resource<Recipe>> =
         flow {
             emit(Resource.Loading())
             try {
@@ -85,7 +85,7 @@ class RecipeRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun toggleFavorite(recipeId: String) {
+    override suspend fun toggleFavorite(recipeId: Int) {
         val recipe = dao.getById(recipeId).first()
         recipe?.let {
             dao.updateFavorite(recipeId, !it.isFavorite)

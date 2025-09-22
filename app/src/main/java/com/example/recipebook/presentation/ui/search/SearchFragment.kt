@@ -40,7 +40,7 @@ class SearchFragment : Fragment() {
         adapter = RecipeAdapter(
             onClick = { recipe ->
                 val action =
-                    SearchFragmentDirections.actionSearchFragmentToHomeFragment(recipe.name)
+                    SearchFragmentDirections.actionSearchFragmentToDetailsFragment(recipe.id)
                 findNavController().navigate(action)
             },
             onFavClick = { recipe ->
