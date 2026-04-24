@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_light"
+    android:background="@color/background"
     tools:context=".presentation.ui.categoryRecipes.CategoryRecipesFragment">
 
     <LinearLayout
@@ -19,7 +19,8 @@
                 android:id="@+id/recipesRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="8dp" />
+                android:padding="16dp"
+                android:clipToPadding="false" />
 
             <TextView
                 android:id="@+id/emptyText"
@@ -27,8 +28,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="No recipes found"
+                android:text="Рецепты не найдены"
                 android:textSize="16sp"
+                android:textColor="@color/text_secondary"
+                android:layout_margin="32dp"
                 android:visibility="gone" />
 
         </FrameLayout>
@@ -41,6 +44,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:indeterminateTint="@color/primary"
         android:visibility="gone" />
 
 </FrameLayout>

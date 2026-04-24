@@ -4,87 +4,89 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_light"
+    android:background="@color/background"
     tools:context=".presentation.ui.home.HomeFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="8dp">
+        android:padding="16dp">
 
-        <!-- Поисковая строка -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/search_button"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_margin="8dp"
+            android:layout_marginBottom="16dp"
             app:cardCornerRadius="28dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/surface"
+            app:strokeColor="@color/card_stroke"
+            app:strokeWidth="1dp"
+            app:cardUseCompatPadding="false">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp">
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:background="@drawable/bg_search_bar">
 
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@android:drawable/ic_menu_search"
-                    android:tint="@color/purple_500" />
+                    app:tint="@color/text_secondary" />
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_marginStart="12dp"
                     android:text="Поиск рецептов"
                     android:textSize="16sp"
-                    android:textColorHint="@android:color/darker_gray"
-                    android:textColor="@color/black" />
+                    android:textColor="@color/text_hint" />
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Категории -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginBottom="12dp"
             android:text="Категории"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="@color/purple_700" />
+            android:textColor="@color/text_primary"
+            android:fontFamily="sans-serif-medium" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/categoriesRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_marginTop="8dp" />
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:clipToPadding="false" />
 
-        <!-- Рецепты -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp"
             android:text="Все рецепты"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="@color/purple_700" />
+            android:textColor="@color/text_primary"
+            android:fontFamily="sans-serif-medium" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recipesRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_marginTop="8dp" />
+            android:clipToPadding="false" />
 
-        <!-- Пустое состояние -->
         <TextView
             android:id="@+id/emptyText"
             android:layout_width="match_parent"
@@ -92,17 +94,18 @@
             android:text="Ничего не найдено"
             android:gravity="center"
             android:textSize="16sp"
+            android:textColor="@color/text_secondary"
             android:layout_marginTop="32dp"
             android:visibility="gone"/>
 
     </LinearLayout>
 
-    <!-- Прогресс бар -->
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:indeterminateTint="@color/primary"
         android:visibility="gone"/>
 </FrameLayout>

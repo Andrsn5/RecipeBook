@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary Colors - Dark Theme -->
+    <color name="primary">#FF8C5A</color>
+    <color name="primary_dark">#FF6B35</color>
+    <color name="primary_light">#FFB07A</color>
+    <color name="primary_container">#3D2415</color>
+    <color name="on_primary_container">#FFE8DD</color>
+
+    <!-- Secondary Colors - Dark Theme -->
+    <color name="secondary">#81C784</color>
+    <color name="secondary_dark">#4CAF50</color>
+    <color name="secondary_light">#A5D6A7</color>
+    <color name="secondary_container">#1B5E20</color>
+    <color name="on_secondary_container">#C8E6C9</color>
+
+    <!-- Background Colors - Dark Theme -->
+    <color name="background">#FF121212</color>
+    <color name="surface">#FF1E1E1E</color>
+    <color name="surface_variant">#FF2C2C2C</color>
+    <color name="surface_container">#FF252525</color>
+
+    <!-- Text Colors - Dark Theme -->
+    <color name="text_primary">#FFFFFFFF</color>
+    <color name="text_secondary">#FFB0B0B0</color>
+    <color name="text_hint">#FF757575</color>
+    <color name="text_on_primary">#FF1A1A1A</color>
+    <color name="text_on_secondary">#FF1A1A1A</color>
+
+    <!-- Card Colors - Dark Theme -->
+    <color name="card_background">#FF1E1E1E</color>
+    <color name="card_background_alt">#FF252525</color>
+    <color name="card_stroke">#FF3D3D3D</color>
+    <color name="card_shadow">#33000000</color>
+
+    <!-- Accent Colors - Dark Theme -->
+    <color name="accent">#FFB74D</color>
+    <color name="accent_light">#FFE0B2</color>
+
+    <!-- Status Colors -->
+    <color name="success">#66BB6A</color>
+    <color name="error">#EF5350</color>
+    <color name="warning">#FFA726</color>
+    <color name="info">#42A5F5</color>
+
+    <!-- Divider - Dark Theme -->
+    <color name="divider">#FF3D3D3D</color>
+
+    <!-- Legacy Colors for compatibility -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="gray_light">#FFE0E0E0</color>
+    <color name="gray_mid">#FF9E9E9E</color>
+    <color name="background_light">#FF121212</color>
+</resources>

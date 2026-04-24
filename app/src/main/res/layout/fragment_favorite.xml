@@ -2,22 +2,23 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_light">
+    android:background="@color/background">
 
     <!-- Сделайте RecyclerView видимым по умолчанию -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="8dp"
-        android:visibility="visible"
-    android:background="#1000FF00"/>
+        android:padding="16dp"
+        android:clipToPadding="false"
+        android:visibility="visible"/>
 
     <ProgressBar
         android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyle"
+        style="?android:attr/progressBarStyleLarge"
         android:layout_gravity="center"
         android:visibility="gone"
+        android:indeterminateTint="@color/primary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
@@ -27,6 +28,8 @@
         android:text="У вас пока нет избранных рецептов"
         android:visibility="gone"
         android:textSize="16sp"
+        android:textColor="@color/text_secondary"
+        android:layout_margin="32dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 </FrameLayout>
