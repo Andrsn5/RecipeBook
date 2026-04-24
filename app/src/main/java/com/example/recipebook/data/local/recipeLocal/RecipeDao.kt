@@ -14,12 +14,17 @@ interface RecipeDao {
     @Query("SELECT * FROM recipes WHERE id = :id LIMIT 1")
     fun getById(id: Int): Flow<RecipeEntity?>
 
+    @Query("SELECT * FROM recipes WHERE id = :id LIMIT 1")
+    suspend fun getByIdOnce(id: Int): RecipeEntity?
+
     @Query("SELECT * FROM recipes WHERE title LIKE '%' || :query || '%' ORDER BY title ASC")
     fun search(query: String): Flow<List<RecipeEntity>>
 
     @Query("SELECT * FROM recipes WHERE isFavorite = 1 ORDER BY title ASC")
     fun getFavorites(): Flow<List<RecipeEntity>>
 
+    @Query("SELECT * FROM recipes WHERE category = :category")
+    fun getByCategory(category: String): Flow<List<RecipeEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(recipes: List<RecipeEntity>)

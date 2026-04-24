@@ -10,7 +10,9 @@ import com.example.recipebook.domain.usecase.recipeUseCase.GetAllRecipesUseCase
 import com.example.recipebook.domain.usecase.recipeUseCase.ToggleFavoriteUseCase
 import com.example.recipebook.presentation.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,8 +30,10 @@ class HomeViewModel @Inject constructor(
     private val _recipesState = MutableStateFlow<UiState<List<Recipe>>>(UiState.Loading)
     val recipesState = _recipesState.asStateFlow()
 
+    private val _navigationEvent = MutableSharedFlow<String>()
+    val navigationEvent = _navigationEvent.asSharedFlow()
+
     private var _selectedCategoryId: Int? = null
-    val selectedCategoryId get() = _selectedCategoryId
 
     fun loadCategories() {
         viewModelScope.launch {
@@ -75,13 +79,15 @@ class HomeViewModel @Inject constructor(
 
     fun onCategorySelected(category: Category) {
         _selectedCategoryId = category.id
-        loadRecipes()
+        viewModelScope.launch {
+            _navigationEvent.emit(category.name)
+        }
     }
 
     fun onFavouriteClick(recipe: Recipe) {
         viewModelScope.launch {
             toggleFavoriteUseCase(recipe.id)
-            loadRecipes()
+            // Flow из БД обновится автоматически через Room
         }
     }
 }

@@ -30,7 +30,13 @@ class RecipeRepositoryImpl @Inject constructor(
                 response.recipes
             },
             saveFetchResult = { recipes ->
-                dao.insertAll(recipes.map { RecipeMapper.dtoToEntity(it) })
+                val mergedEntities = recipes.map { dto ->
+                    val entity = RecipeMapper.dtoToEntity(dto)
+                    val existing = dao.getByIdOnce(entity.id)
+                    if (existing != null) entity.copy(isFavorite = existing.isFavorite)
+                    else entity
+                }
+                dao.insertAll(mergedEntities)
             },
             shouldFetch = { cached -> cached.isEmpty() },
             networkMonitor = networkMonitor
@@ -47,6 +53,41 @@ class RecipeRepositoryImpl @Inject constructor(
                     }
             } catch (e: Exception) {
                 emit(Resource.Error<List<Recipe>>(e.localizedMessage ?: "Error searching"))
+            }
+        }
+
+    override fun getRecipesByCategory(category: String): Flow<Resource<List<Recipe>>> =
+        flow {
+            emit(Resource.Loading())
+            try {
+                val response = api.getRecipesByCategory(type = category, number = 20)
+                val entities = response.results.map { RecipeMapper.dtoToEntity(it).copy(category = category) }
+                val mergedEntities = entities.map { entity ->
+                    val existing = dao.getByIdOnce(entity.id)
+                    if (existing != null) entity.copy(isFavorite = existing.isFavorite)
+                    else entity
+                }
+                dao.insertAll(mergedEntities)
+                dao.getByCategory(category)
+                    .map { RecipeMapper.entityListToDomain(it) }
+                    .collect { result ->
+                        emit(Resource.Success(result))
+                    }
+            } catch (e: Exception) {
+                Log.e("RecipeRepositoryImpl", "Error loading recipes by category from network: ${e.message}")
+                try {
+                    val cachedRecipes = dao.getByCategory(category).first()
+                    if (cachedRecipes.isNotEmpty()) {
+                        Log.d("RecipeRepositoryImpl", "Using cached recipes for category: $category")
+                        emit(Resource.Success(RecipeMapper.entityListToDomain(cachedRecipes)))
+                    } else {
+                        Log.e("RecipeRepositoryImpl", "No cached recipes found for category: $category")
+                        emit(Resource.Error<List<Recipe>>("No internet and no cache"))
+                    }
+                } catch (cacheException: Exception) {
+                    Log.e("RecipeRepositoryImpl", "Error loading cached recipes: ${cacheException.message}")
+                    emit(Resource.Error<List<Recipe>>("No internet and no cache"))
+                }
             }
         }
 
@@ -87,8 +128,6 @@ class RecipeRepositoryImpl @Inject constructor(
             recipe?.let {
                 val newFavoriteState = !it.isFavorite
                 dao.updateFavorite(recipeId, newFavoriteState)
-
-                val updatedRecipe = dao.getById(recipeId).first()
             } ?: run {
                 Log.e("RecipeRepositoryImpl", "Recipe with id $recipeId not found in DB")
             }

@@ -1,5 +1,6 @@
-package com.example.recipebook.presentation.ui.home
+package com.example.recipebook.presentation.ui.categoryRecipes
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,8 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.recipebook.databinding.FragmentHomeBinding
-import com.example.recipebook.presentation.adapter.CategoriesAdapter
+import com.example.recipebook.databinding.FragmentCategoryRecipesBinding
 import com.example.recipebook.presentation.adapter.RecipeAdapter
 import com.example.recipebook.presentation.ui.state.UiState
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,103 +18,41 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class HomeFragment : Fragment() {
+class CategoryRecipesFragment : Fragment() {
 
-    private var _binding: FragmentHomeBinding? = null
-
+    private var _binding: FragmentCategoryRecipesBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: HomeViewModel by viewModels()
-    private lateinit var categoriesAdapter: CategoriesAdapter
+    private val viewModel: CategoryRecipesViewModel by viewModels()
     private lateinit var recipesAdapter: RecipeAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        _binding = FragmentCategoryRecipesBinding.inflate(inflater, container, false)
         return binding.root
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupAdapters()
-        setupRecyclerViews()
-        observeViewModel()
-        setupClickListeners()
-
-
-        viewModel.loadCategories()
-        viewModel.loadRecipes()
-    }
-
-    private fun setupAdapters() {
-        categoriesAdapter = CategoriesAdapter { category ->
-            viewModel.onCategorySelected(category)
-        }
-
         recipesAdapter = RecipeAdapter(
             onClick = { recipe ->
-                val action = HomeFragmentDirections.actionHomeFragmentToDetailsFragment(recipe.id)
+                val action = CategoryRecipesFragmentDirections.actionCategoryRecipesFragmentToDetailsFragment(recipe.id)
                 findNavController().navigate(action)
             },
             onFavClick = { recipe ->
                 viewModel.onFavouriteClick(recipe)
             }
         )
-    }
-
-    private fun setupRecyclerViews() {
-
-        binding.categoriesRecyclerView.apply {
-            adapter = categoriesAdapter
-            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
-                context,
-                androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL,
-                false
-            )
-            setHasFixedSize(true)
-        }
-
 
         binding.recipesRecyclerView.apply {
             adapter = recipesAdapter
             layoutManager = GridLayoutManager(context, 2)
             setHasFixedSize(true)
         }
-    }
-
-    private fun observeViewModel() {
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.navigationEvent.collect { categoryName ->
-                findNavController().navigate(
-                    HomeFragmentDirections.actionHomeFragmentToCategoryRecipesFragment(categoryName)
-                )
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.categoriesState.collectLatest { state ->
-                if (!isAdded) return@collectLatest
-
-                when (state) {
-                    is UiState.Loading -> {
-
-                    }
-                    is UiState.Success -> {
-                        val categories = state.data
-                        categoriesAdapter.submitList(categories)
-                    }
-                    is UiState.Error -> {
-
-                    }
-                    else -> {}
-                }
-            }
-        }
-
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.recipesState.collectLatest { state ->
@@ -124,14 +62,18 @@ class HomeFragment : Fragment() {
                     is UiState.Loading -> {
                         binding.progressBar.visibility = View.VISIBLE
                         binding.emptyText.visibility = View.GONE
+                        binding.recipesRecyclerView.visibility = View.GONE
                     }
                     is UiState.Success -> {
                         binding.progressBar.visibility = View.GONE
                         val recipes = state.data
                         if (recipes.isEmpty()) {
                             binding.emptyText.visibility = View.VISIBLE
+                            binding.emptyText.text = "No recipes found"
+                            binding.recipesRecyclerView.visibility = View.GONE
                         } else {
                             binding.emptyText.visibility = View.GONE
+                            binding.recipesRecyclerView.visibility = View.VISIBLE
                             recipesAdapter.submitList(recipes)
                         }
                     }
@@ -139,16 +81,16 @@ class HomeFragment : Fragment() {
                         binding.progressBar.visibility = View.GONE
                         binding.emptyText.visibility = View.VISIBLE
                         binding.emptyText.text = state.message
+                        binding.recipesRecyclerView.visibility = View.GONE
                     }
-                    else -> {}
+                    is UiState.Empty -> {
+                        binding.progressBar.visibility = View.GONE
+                        binding.emptyText.visibility = View.VISIBLE
+                        binding.emptyText.text = "No recipes found"
+                        binding.recipesRecyclerView.visibility = View.GONE
+                    }
                 }
             }
-        }
-    }
-
-    private fun setupClickListeners() {
-        binding.searchButton.setOnClickListener {
-            findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToSearchFragment())
         }
     }
 

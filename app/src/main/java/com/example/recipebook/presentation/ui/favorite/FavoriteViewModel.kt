@@ -22,7 +22,9 @@ class FavoriteViewModel @Inject constructor(
     private val _favoritesState = MutableStateFlow<UiState<List<Recipe>>>(UiState.Loading)
     val favoritesState = _favoritesState.asStateFlow()
 
-
+    init {
+        loadFavorites()
+    }
 
 
 

@@ -18,6 +18,12 @@ interface RecipeApi {
         @Query("number") number: Int = 20
     ): SearchResponse
 
+    @GET("recipes/complexSearch")
+    suspend fun getRecipesByCategory(
+        @Query("type") type: String,
+        @Query("number") number: Int = 20
+    ): SearchResponse
+
     @GET("recipes/{id}/information")
     suspend fun getRecipeById(
         @Path("id") id: String

@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.example.recipebook"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.recipebook"
@@ -23,20 +23,26 @@ android {
         ndk {
             abiFilters.addAll(listOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a"))
         }
-        //noinspection WrongGradleMethod
-
-
     }
 
-
-
     buildTypes {
-        release {
+        debug {
             isMinifyEnabled = false
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+            buildConfigField("boolean", "TESTING", "true")
+            buildConfigField("String", "BASE_URL", "\"https://api.spoonacular.com/\"")
+        }
+
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("boolean", "TESTING", "false")
+            buildConfigField("String", "BASE_URL", "\"https://api.spoonacular.com/\"")
         }
     }
     compileOptions {
@@ -48,6 +54,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     configurations.all {
         resolutionStrategy {

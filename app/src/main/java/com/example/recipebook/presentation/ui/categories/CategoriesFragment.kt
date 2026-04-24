@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.recipebook.databinding.FragmentCategoriesBinding
 import com.example.recipebook.presentation.adapter.CategoriesAdapterBig
@@ -66,6 +67,14 @@ class CategoriesFragment : Fragment() {
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.navigationEvent.collect { categoryName ->
+                findNavController().navigate(
+                    CategoriesFragmentDirections.actionCategoriesFragmentToCategoryRecipesFragment(categoryName)
+                )
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.categoriesState.collectLatest { state ->
                 if (!isAdded) return@collectLatest
 
@@ -78,7 +87,7 @@ class CategoriesFragment : Fragment() {
                     }
                     is UiState.Success -> {
                         binding.progressBar.visibility = View.GONE
-                        val categories = state.data ?: emptyList()
+                        val categories = state.data
 
                         if (categories.isEmpty()) {
                             binding.emptyView.visibility = View.VISIBLE
@@ -99,7 +108,7 @@ class CategoriesFragment : Fragment() {
                         binding.progressBar.visibility = View.GONE
                         binding.emptyView.visibility = View.VISIBLE
                         binding.recyclerView.visibility = View.GONE
-                        binding.emptyView.text = state.message ?: "Произошла ошибка"
+                        binding.emptyView.text = state.message
                     }
                     is UiState.Empty -> {
                         binding.progressBar.visibility = View.GONE

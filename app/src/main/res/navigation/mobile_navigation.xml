@@ -22,6 +22,33 @@
         <action
             android:id="@+id/action_homeFragment_to_searchFragment"
             app:destination="@id/nav_search" />
+
+        <action
+            android:id="@+id/action_homeFragment_to_categoryRecipesFragment"
+            app:destination="@id/nav_categoryRecipes">
+            <argument
+                android:name="categoryName"
+                app:argType="string" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_categoryRecipes"
+        android:name="com.example.recipebook.presentation.ui.categoryRecipes.CategoryRecipesFragment"
+        android:label="Category Recipes"
+        tools:layout="@layout/fragment_category_recipes">
+
+        <argument
+            android:name="categoryName"
+            app:argType="string" />
+
+        <action
+            android:id="@+id/action_categoryRecipesFragment_to_detailsFragment"
+            app:destination="@id/nav_details">
+            <argument
+                android:name="recipeId"
+                app:argType="integer" />
+        </action>
     </fragment>
 
     <fragment
@@ -42,6 +69,14 @@
             <argument
                 android:name="categoryName"
                 app:argType="integer" />
+        </action>
+
+        <action
+            android:id="@+id/action_categoriesFragment_to_categoryRecipesFragment"
+            app:destination="@id/nav_categoryRecipes">
+            <argument
+                android:name="categoryName"
+                app:argType="string" />
         </action>
     </fragment>
 
