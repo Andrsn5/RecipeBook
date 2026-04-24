@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
@@ -47,7 +49,7 @@ class DetailsFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = IngredientsAdapter(emptyList())
+        adapter = IngredientsAdapter()
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
             adapter = this@DetailsFragment.adapter
@@ -65,24 +67,24 @@ class DetailsFragment : Fragment() {
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.state.collect { state ->
-                if (!isAdded || _binding == null) return@collect
-
-                when (state) {
-                    is UiState.Loading -> showLoading(true)
-                    is UiState.Success -> {
-                        showLoading(false)
-                        state.data?.let { recipe ->
-                            displayRecipe(recipe)
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collect { state ->
+                    when (state) {
+                        is UiState.Loading -> showLoading(true)
+                        is UiState.Success -> {
+                            showLoading(false)
+                            state.data.let { recipe ->
+                                displayRecipe(recipe)
+                            }
                         }
-                    }
-                    is UiState.Error -> {
-                        showLoading(false)
-                        showError(state.message)
-                    }
-                    is UiState.Empty -> {
-                        showLoading(false)
-                        showError("Рецепт не найден")
+                        is UiState.Error -> {
+                            showLoading(false)
+                            showError(state.message)
+                        }
+                        is UiState.Empty -> {
+                            showLoading(false)
+                            showError("Рецепт не найден")
+                        }
                     }
                 }
             }
@@ -90,8 +92,6 @@ class DetailsFragment : Fragment() {
     }
 
     private fun displayRecipe(recipe: Recipe) {
-        if (!isAdded || _binding == null) return // Защита от NPE
-
         if (!recipe.imageUrl.isNullOrEmpty()) {
             binding.recipeImage.load(recipe.imageUrl) {
                 crossfade(true)
@@ -103,14 +103,12 @@ class DetailsFragment : Fragment() {
         }
 
         binding.recipeTitle.text = recipe.name
-        binding.recipeDescription.text = recipe.summary ?: "Описание отсутствует"
+        binding.recipeDescription.text = recipe.summary
         updateFavoriteIcon(recipe.favourite)
-        adapter.updateData(recipe.ingredients)
-        viewModel.setCurrentRecipe(recipe)
+        adapter.submitList(recipe.ingredients)
     }
 
     private fun updateFavoriteIcon(isFavorite: Boolean) {
-        if (!isAdded || _binding == null) return
         binding.favoriteButton.setImageResource(
             if (isFavorite) R.drawable.ic_favorite_selected
             else R.drawable.ic_favorite_noselected
@@ -118,12 +116,10 @@ class DetailsFragment : Fragment() {
     }
 
     private fun showLoading(show: Boolean) {
-        if (!isAdded || _binding == null) return
         binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
     }
 
     private fun showError(message: String) {
-        if (!isAdded || _binding == null) return
         binding.recipeTitle.text = "Ошибка"
         binding.recipeDescription.text = message
     }

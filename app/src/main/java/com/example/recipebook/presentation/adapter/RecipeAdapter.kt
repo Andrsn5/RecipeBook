@@ -1,12 +1,12 @@
 package com.example.recipebook.presentation.adapter
 
-import com.example.recipebook.R
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.example.recipebook.R
 import com.example.recipebook.databinding.ItemRecipeBinding
 import com.example.recipebook.domain.model.Recipe
 
@@ -15,9 +15,16 @@ class RecipeAdapter(
     private val onFavClick: (Recipe) -> Unit
 ) : ListAdapter<Recipe, RecipeAdapter.RecipeViewHolder>(DiffCallback) {
 
+    companion object {
+         val PLACEHOLDER_DRAWABLE = R.drawable.ic_launcher_background
+         val ERROR_DRAWABLE = R.drawable.ic_launcher_foreground
+         val FAVORITE_SELECTED_DRAWABLE = R.drawable.ic_favorite_selected
+         val FAVORITE_NO_SELECTED_DRAWABLE = R.drawable.ic_favorite_noselected
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
         val binding = ItemRecipeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return RecipeViewHolder(binding)
+        return RecipeViewHolder(binding, onClick, onFavClick)
     }
 
     override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
@@ -32,21 +39,23 @@ class RecipeAdapter(
             oldItem == newItem
     }
 
-    inner class RecipeViewHolder(private val binding: ItemRecipeBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    class RecipeViewHolder(
+        private val binding: ItemRecipeBinding,
+        private val onClick: (Recipe) -> Unit,
+        private val onFavClick: (Recipe) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(recipe: Recipe) {
             binding.recipeTitle.text = recipe.name
 
-
             if (!recipe.imageUrl.isNullOrEmpty()) {
                 binding.recipeImage.load(recipe.imageUrl) {
                     crossfade(true)
-                    placeholder(R.drawable.ic_launcher_background)
-                    error(R.drawable.ic_launcher_foreground)
+                    placeholder(PLACEHOLDER_DRAWABLE)
+                    error(ERROR_DRAWABLE)
                 }
             } else {
-                binding.recipeImage.setImageResource(R.drawable.ic_launcher_foreground)
+                binding.recipeImage.setImageResource(ERROR_DRAWABLE)
             }
 
             updateFavoriteIcon(recipe.favourite)
@@ -57,14 +66,13 @@ class RecipeAdapter(
 
             binding.favoriteButton.setOnClickListener {
                 onFavClick(recipe)
-                updateFavoriteIcon(!recipe.favourite)
             }
         }
 
         private fun updateFavoriteIcon(isFavorite: Boolean) {
             binding.favoriteButton.setImageResource(
-                if (isFavorite) R.drawable.ic_favorite_selected
-                else R.drawable.ic_favorite_noselected
+                if (isFavorite) FAVORITE_SELECTED_DRAWABLE
+                else FAVORITE_NO_SELECTED_DRAWABLE
             )
         }
     }

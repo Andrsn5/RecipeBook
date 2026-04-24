@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.recipebook.data.util.Resource
 import com.example.recipebook.domain.model.Recipe
 import com.example.recipebook.domain.usecase.recipeUseCase.GetRecipesByCategoryUseCase
+import com.example.recipebook.domain.usecase.recipeUseCase.LoadMoreRecipesByCategoryUseCase
 import com.example.recipebook.domain.usecase.recipeUseCase.ToggleFavoriteUseCase
 import com.example.recipebook.presentation.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CategoryRecipesViewModel @Inject constructor(
     private val getRecipesByCategoryUseCase: GetRecipesByCategoryUseCase,
+    private val loadMoreRecipesByCategoryUseCase: LoadMoreRecipesByCategoryUseCase,
     private val toggleFavouriteUseCase: ToggleFavoriteUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -28,6 +30,9 @@ class CategoryRecipesViewModel @Inject constructor(
     val recipesState: StateFlow<UiState<List<Recipe>>> = _recipesState
 
     private var currentCategory: String? = null
+
+    private var currentOffset = 0
+    private var isLoadingMore = false
 
     init {
         val categoryName = savedStateHandle.get<String>("categoryName")
@@ -55,12 +60,14 @@ class CategoryRecipesViewModel @Inject constructor(
                             }
                             is Resource.Error -> {
                                 Log.e("CategoryRecipesViewModel", "Error loading recipes: ${resource.message}")
-                                _recipesState.value = UiState.Error(resource.message ?: "Error loading recipes")
+                                val cachedData = resource.data
+                                _recipesState.value = UiState.Error(resource.message ?: "Unknown error", cachedData)
                             }
                         }
                     }
                     .collect()
             } catch (e: Exception) {
+                if (e is kotlinx.coroutines.CancellationException) throw e
                 Log.e("CategoryRecipesViewModel", "Exception in loadRecipes: ${e.message}")
                 _recipesState.value = UiState.Error(e.localizedMessage ?: "Unknown error")
             }
@@ -70,12 +77,22 @@ class CategoryRecipesViewModel @Inject constructor(
     fun onFavouriteClick(recipe: Recipe) {
         viewModelScope.launch {
             toggleFavouriteUseCase(recipe.id)
-            val currentState = _recipesState.value
-            if (currentState is UiState.Success) {
-                val updated = currentState.data.map {
-                    if (it.id == recipe.id) it.copy(favourite = !it.favourite) else it
-                }
-                _recipesState.value = UiState.Success(updated)
+        }
+    }
+
+    fun loadMoreRecipes() {
+        val category = currentCategory ?: return
+        if (isLoadingMore) return
+        viewModelScope.launch {
+            isLoadingMore = true
+            try {
+                currentOffset += 20
+                loadMoreRecipesByCategoryUseCase(category, currentOffset)
+            } catch (e: Exception) {
+                if (e is kotlinx.coroutines.CancellationException) throw e
+                _recipesState.value = UiState.Error(e.localizedMessage ?: "Unknown error")
+            } finally {
+                isLoadingMore = false
             }
         }
     }

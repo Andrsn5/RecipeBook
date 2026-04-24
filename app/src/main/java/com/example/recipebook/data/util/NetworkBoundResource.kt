@@ -18,22 +18,16 @@ inline fun <ResultType, RequestType> networkBoundResource(
 
     val data = query().first()
 
-    if (data != null && data is Collection<*> && (data as Collection<*>).isNotEmpty()) {
-        emit(Resource.Success(data))
-    }
-
     if (shouldFetch(data) && networkMonitor.isConnected.value) {
         try {
             emit(Resource.Loading())
             val networkResult = fetch()
             saveFetchResult(networkResult)
-            emitAll(query().map { Resource.Success(it) })
         } catch (e: Exception) {
             emit(Resource.Error("Ошибка загрузки: ${e.localizedMessage}", data))
         }
     } else if (shouldFetch(data) && !networkMonitor.isConnected.value) {
-        if (data == null || data is Collection<*> && (data as Collection<*>).isEmpty()) {
-            emit(Resource.Error("Нет подключения к интернету"))
-        }
+        emit(Resource.Error("Нет подключения к интернету", data))
     }
+    emitAll(query().map { Resource.Success(it) })
 }

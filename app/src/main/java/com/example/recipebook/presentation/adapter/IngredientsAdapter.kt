@@ -2,59 +2,56 @@ package com.example.recipebook.presentation.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.recipebook.R
-import com.example.recipebook.data.remote.recipeRemote.IngredientDto
 import com.example.recipebook.databinding.ItemProductBinding
+import com.example.recipebook.presentation.model.IngredientUi
 
-class IngredientsAdapter(private var ingredients: List<IngredientDto>) :
-    RecyclerView.Adapter<IngredientsAdapter.MyViewHolder>() {
+class IngredientsAdapter : ListAdapter<IngredientUi, IngredientsAdapter.ViewHolder>(DiffCallback) {
 
-    fun updateData(newIngredients: List<IngredientDto>) {
-        ingredients = newIngredients
-        notifyDataSetChanged()
+    companion object {
+         val PLACEHOLDER_DRAWABLE = R.drawable.ic_launcher_background
+         val ERROR_DRAWABLE = R.drawable.ic_launcher_foreground
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
+    object DiffCallback : DiffUtil.ItemCallback<IngredientUi>() {
+        override fun areItemsTheSame(oldItem: IngredientUi, newItem: IngredientUi): Boolean =
+            oldItem.name == newItem.name
+
+        override fun areContentsTheSame(oldItem: IngredientUi, newItem: IngredientUi): Boolean =
+            oldItem == newItem
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemProductBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
         )
-        return MyViewHolder(binding)
+        return ViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        holder.bind(ingredients[position])
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(getItem(position))
     }
 
-    override fun getItemCount(): Int = ingredients.size
-
-    class MyViewHolder(private val binding: ItemProductBinding) :
+    class ViewHolder(private val binding: ItemProductBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(ingredient: IngredientDto) {
+        fun bind(ingredient: IngredientUi) {
             binding.productTittle.text = ingredient.name
 
-
             if (!ingredient.imageUrl.isNullOrEmpty()) {
-                if (ingredient.imageUrl.startsWith("http")) {
-                    binding.productImage.load(ingredient.imageUrl) {
-                        crossfade(true)
-                        placeholder(R.drawable.ic_launcher_background)
-                        error(R.drawable.ic_launcher_foreground)
-                    }
-                } else {
-                    val imageResourceId = ingredient.imageUrl.toIntOrNull() ?: 0
-                    if (imageResourceId != 0) {
-                        binding.productImage.setImageResource(imageResourceId)
-                    } else {
-                        binding.productImage.setImageResource(R.drawable.ic_launcher_foreground)
-                    }
+                binding.productImage.load(ingredient.imageUrl) {
+                    crossfade(true)
+                    placeholder(PLACEHOLDER_DRAWABLE)
+                    error(ERROR_DRAWABLE)
                 }
             } else {
-                binding.productImage.setImageResource(R.drawable.ic_launcher_foreground)
+                binding.productImage.setImageResource(ERROR_DRAWABLE)
             }
         }
     }

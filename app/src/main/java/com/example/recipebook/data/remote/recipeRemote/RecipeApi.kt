@@ -3,13 +3,13 @@ package com.example.recipebook.data.remote.recipeRemote
 import com.example.recipebook.data.remote.RecipeResponse
 import com.example.recipebook.data.remote.SearchResponse
 import retrofit2.http.GET
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface RecipeApi {
     @GET("recipes/random")
     suspend fun getRandomRecipes(
-        @Query("number") number: Int = 20
+        @Query("number") number: Int = 20,
+        @Query("offset") offset: Int = 0
     ): RecipeResponse
 
     @GET("recipes/complexSearch")
@@ -21,11 +21,7 @@ interface RecipeApi {
     @GET("recipes/complexSearch")
     suspend fun getRecipesByCategory(
         @Query("type") type: String,
-        @Query("number") number: Int = 20
+        @Query("number") number: Int = 20,
+        @Query("offset") offset: Int = 0
     ): SearchResponse
-
-    @GET("recipes/{id}/information")
-    suspend fun getRecipeById(
-        @Path("id") id: String
-    ): RecipeDto
 }

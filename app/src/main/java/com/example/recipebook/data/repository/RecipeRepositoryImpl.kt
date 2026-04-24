@@ -38,7 +38,7 @@ class RecipeRepositoryImpl @Inject constructor(
                 }
                 dao.insertAll(mergedEntities)
             },
-            shouldFetch = { cached -> cached.isEmpty() },
+            shouldFetch = { true },
             networkMonitor = networkMonitor
         )
 
@@ -75,19 +75,7 @@ class RecipeRepositoryImpl @Inject constructor(
                     }
             } catch (e: Exception) {
                 Log.e("RecipeRepositoryImpl", "Error loading recipes by category from network: ${e.message}")
-                try {
-                    val cachedRecipes = dao.getByCategory(category).first()
-                    if (cachedRecipes.isNotEmpty()) {
-                        Log.d("RecipeRepositoryImpl", "Using cached recipes for category: $category")
-                        emit(Resource.Success(RecipeMapper.entityListToDomain(cachedRecipes)))
-                    } else {
-                        Log.e("RecipeRepositoryImpl", "No cached recipes found for category: $category")
-                        emit(Resource.Error<List<Recipe>>("No internet and no cache"))
-                    }
-                } catch (cacheException: Exception) {
-                    Log.e("RecipeRepositoryImpl", "Error loading cached recipes: ${cacheException.message}")
-                    emit(Resource.Error<List<Recipe>>("No internet and no cache"))
-                }
+                emit(Resource.Error<List<Recipe>>("No internet connection"))
             }
         }
 
@@ -133,6 +121,49 @@ class RecipeRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             Log.e("RecipeRepositoryImpl", "Error toggling favorite: ${e.message}")
+        }
+    }
+
+    override suspend fun loadMoreRecipes(offset: Int): Int {
+        try {
+            Log.d("RecipeRepositoryImpl", "Loading more recipes with offset: $offset")
+            val response = api.getRandomRecipes(number = 20, offset = offset)
+            val newEntities = response.recipes.map { dto ->
+                val entity = RecipeMapper.dtoToEntity(dto)
+                val existing = dao.getByIdOnce(entity.id)
+                if (existing != null) entity.copy(isFavorite = existing.isFavorite)
+                else entity
+            }
+            dao.insertAll(newEntities)
+            Log.d("RecipeRepositoryImpl", "Inserted ${newEntities.size} recipes")
+            // Оставляем последние 30 + все лайкнутые
+            dao.deleteOldNonFavorites(keepCount = 30)
+            val homeCount = dao.getHomeRecipesCount()
+            Log.d("RecipeRepositoryImpl", "Home recipes count after cleanup: $homeCount")
+            return response.recipes.size
+        } catch (e: Exception) {
+            Log.e("RecipeRepositoryImpl", "Error loading more recipes: ${e.message}")
+            throw e
+        }
+    }
+
+    override suspend fun loadMoreRecipesByCategory(category: String, offset: Int): Int {
+        try {
+            Log.d("RecipeRepositoryImpl", "Loading more recipes for category: $category with offset: $offset")
+            val response = api.getRecipesByCategory(type = category, number = 20, offset = offset)
+            val newEntities = response.results.map { dto ->
+                val entity = RecipeMapper.dtoToEntity(dto).copy(category = category)
+                val existing = dao.getByIdOnce(entity.id)
+                if (existing != null) entity.copy(isFavorite = existing.isFavorite)
+                else entity
+            }
+            dao.insertAll(newEntities)
+            Log.d("RecipeRepositoryImpl", "Inserted ${newEntities.size} recipes for category: $category")
+            dao.deleteOldNonFavoritesForCategory(category = category, keepCount = 30)
+            return response.results.size
+        } catch (e: Exception) {
+            Log.e("RecipeRepositoryImpl", "Error loading more recipes by category: ${e.message}")
+            throw e
         }
     }
 }

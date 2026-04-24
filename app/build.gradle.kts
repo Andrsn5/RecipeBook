@@ -32,6 +32,7 @@ android {
             versionNameSuffix = "-debug"
             buildConfigField("boolean", "TESTING", "true")
             buildConfigField("String", "BASE_URL", "\"https://api.spoonacular.com/\"")
+            buildConfigField("String", "API_KEY", "\"401293d3dcc346729d8697c6f234f52c\"")
         }
 
         release {
@@ -43,6 +44,7 @@ android {
             )
             buildConfigField("boolean", "TESTING", "false")
             buildConfigField("String", "BASE_URL", "\"https://api.spoonacular.com/\"")
+            buildConfigField("String", "API_KEY", "\"401293d3dcc346729d8697c6f234f52c\"")
         }
     }
     compileOptions {

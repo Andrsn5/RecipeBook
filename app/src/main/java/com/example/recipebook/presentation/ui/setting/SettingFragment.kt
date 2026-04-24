@@ -12,7 +12,7 @@ import com.example.recipebook.databinding.FragmentSettingBinding
 class SettingFragment: Fragment() {
 
     lateinit var _binding: FragmentSettingBinding
-    private val binding get() = _binding!!
+    private val binding get() = _binding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

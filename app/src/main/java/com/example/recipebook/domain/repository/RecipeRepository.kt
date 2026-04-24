@@ -12,4 +12,6 @@ interface RecipeRepository {
     fun getFavoriteRecipes(): Flow<Resource<List<Recipe>>>
 
     suspend fun toggleFavorite(recipeId: Int)
+    suspend fun loadMoreRecipes(offset: Int): Int
+    suspend fun loadMoreRecipesByCategory(category: String, offset: Int): Int
 }
