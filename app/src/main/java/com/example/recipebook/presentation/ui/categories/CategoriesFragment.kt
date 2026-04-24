@@ -7,11 +7,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.recipebook.databinding.FragmentCategoriesBinding
-import com.example.recipebook.presentation.adapter.CategoriesAdapterBig
+import com.example.recipebook.presentation.adapter.CategoriesAdapter
+import com.example.recipebook.presentation.adapter.CategoryLayoutType
 import com.example.recipebook.presentation.ui.state.UiState
+import com.example.recipebook.presentation.ui.util.showError
+import com.example.recipebook.presentation.ui.util.showOfflineBanner
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -23,7 +29,7 @@ class CategoriesFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: CategoriesViewModel by viewModels()
-    private lateinit var adapter: CategoriesAdapterBig
+    private lateinit var adapter: CategoriesAdapter
 
     companion object {
         private const val TAG = "CategoriesFragment"
@@ -51,7 +57,7 @@ class CategoriesFragment : Fragment() {
     }
 
     private fun setupAdapter() {
-        adapter = CategoriesAdapterBig { category ->
+        adapter = CategoriesAdapter(CategoryLayoutType.BIG) { category ->
             viewModel.onCategorySelected(category)
         }
     }
@@ -66,53 +72,74 @@ class CategoriesFragment : Fragment() {
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.categoriesState.collectLatest { state ->
-                if (!isAdded) return@collectLatest
-
-
-                when (state) {
-                    is UiState.Loading -> {
-                        binding.progressBar.visibility = View.VISIBLE
-                        binding.emptyView.visibility = View.GONE
-                        binding.recyclerView.visibility = View.GONE
-                    }
-                    is UiState.Success -> {
-                        binding.progressBar.visibility = View.GONE
-                        val categories = state.data ?: emptyList()
-
-                        if (categories.isEmpty()) {
-                            binding.emptyView.visibility = View.VISIBLE
-                            binding.recyclerView.visibility = View.GONE
-                        } else {
-                            Log.d(TAG, "Submitting ${categories.size} categories to adapter")
-                            binding.emptyView.visibility = View.GONE
-                            binding.recyclerView.visibility = View.VISIBLE
-
-                            if (binding.recyclerView.adapter == null) {
-                                binding.recyclerView.adapter = adapter
-                            }
-
-                            adapter.submitList(categories)
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.events.collect { event ->
+                    when (event) {
+                        is CategoriesViewModel.CategoriesEvent.NavigateToRecipes -> {
+                            findNavController().navigate(
+                                CategoriesFragmentDirections.actionCategoriesFragmentToCategoryRecipesFragment(event.categoryName)
+                            )
                         }
-                    }
-                    is UiState.Error -> {
-                        binding.progressBar.visibility = View.GONE
-                        binding.emptyView.visibility = View.VISIBLE
-                        binding.recyclerView.visibility = View.GONE
-                        binding.emptyView.text = state.message ?: "Произошла ошибка"
-                    }
-                    is UiState.Empty -> {
-                        binding.progressBar.visibility = View.GONE
-                        binding.emptyView.visibility = View.VISIBLE
-                        binding.recyclerView.visibility = View.GONE
                     }
                 }
             }
         }
-    }
 
-    override fun onResume() {
-        super.onResume()
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.categoriesState.collectLatest { state ->
+                    when (state) {
+                        is UiState.Loading -> {
+                            binding.progressBar.visibility = View.VISIBLE
+                            binding.emptyView.visibility = View.GONE
+                            binding.recyclerView.visibility = View.GONE
+                        }
+                        is UiState.Success -> {
+                            binding.progressBar.visibility = View.GONE
+                            val categories = state.data
+
+                            if (categories.isEmpty()) {
+                                binding.emptyView.visibility = View.VISIBLE
+                                binding.recyclerView.visibility = View.GONE
+                            } else {
+                                Log.d(TAG, "Submitting ${categories.size} categories to adapter")
+                                binding.emptyView.visibility = View.GONE
+                                binding.recyclerView.visibility = View.VISIBLE
+                                adapter.submitList(categories)
+                            }
+                        }
+                        is UiState.Error -> {
+                            binding.progressBar.visibility = View.GONE
+                            val message = state.message
+                            val cachedData = state.data
+
+                            if (!cachedData.isNullOrEmpty()) {
+                                binding.emptyView.visibility = View.GONE
+                                binding.recyclerView.visibility = View.VISIBLE
+                                adapter.submitList(cachedData)
+                            } else {
+                                binding.emptyView.visibility = View.VISIBLE
+                                binding.recyclerView.visibility = View.GONE
+                            }
+
+                            if (message.contains("интернет", ignoreCase = true) ||
+                                message.contains("internet", ignoreCase = true) ||
+                                message.contains("UnknownHost", ignoreCase = true) ||
+                                message.contains("connect", ignoreCase = true)) {
+                                showOfflineBanner()
+                            } else {
+                                showError(message)
+                            }
+                        }
+                        is UiState.Empty -> {
+                            binding.progressBar.visibility = View.GONE
+                            binding.emptyView.visibility = View.VISIBLE
+                            binding.recyclerView.visibility = View.GONE
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onDestroyView() {

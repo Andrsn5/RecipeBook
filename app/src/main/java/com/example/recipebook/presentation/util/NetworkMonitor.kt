@@ -29,15 +29,11 @@ class NetworkMonitor(private val context: Context) {
         }
     }
 
-    fun register() {
+    init {
         val request = NetworkRequest.Builder()
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
             .build()
         connectivityManager.registerNetworkCallback(request, networkCallback)
-    }
-
-    fun unregister() {
-        connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 
     private fun showToast(message: String) {

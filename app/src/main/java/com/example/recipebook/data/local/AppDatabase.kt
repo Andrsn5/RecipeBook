@@ -9,10 +9,9 @@ import com.example.recipebook.data.local.recipeLocal.RecipeDao
 import com.example.recipebook.data.local.recipeLocal.RecipeEntity
 import com.example.recipebook.data.util.Converters
 
-@Database( entities = [RecipeEntity::class, CategoryEntity::class], version = 1, exportSchema = true)
+@Database(entities = [RecipeEntity::class, CategoryEntity::class], version = 2, exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class AppDatabase: RoomDatabase() {
     abstract fun recipeDao(): RecipeDao
     abstract fun categoryDao(): CategoryDao
-
 }

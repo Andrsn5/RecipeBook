@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.recipebook.databinding.FragmentFavoriteBinding
@@ -61,51 +63,45 @@ class FavoriteFragment : Fragment() {
     private fun setupRecyclerView() {
 
         binding.recyclerView.apply {
-            // ВАЖНО: убедимся, что адаптер установлен
             adapter = this@FavoriteFragment.adapter
             layoutManager = GridLayoutManager(requireContext(), 2)
             setHasFixedSize(true)
-
-            setBackgroundColor(0x10FF0000)
         }
     }
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.favoritesState.collect { state ->
-                if (!isAdded) return@collect
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.favoritesState.collect { state ->
+                    when (state) {
+                        is UiState.Loading -> {
+                            showLoading(true)
+                            binding.emptyView.visibility = View.GONE
+                            binding.recyclerView.visibility = View.GONE
+                        }
+                        is UiState.Success -> {
+                            showLoading(false)
+                            val favorites = state.data
 
-                when (state) {
-                    is UiState.Loading -> {
-                        showLoading(true)
-                        binding.emptyView.visibility = View.GONE
-                        binding.recyclerView.visibility = View.GONE
-                    }
-                    is UiState.Success -> {
-                        showLoading(false)
-                        val favorites = state.data ?: emptyList()
+                            if (favorites.isEmpty()) {
+                                showEmptyState(true)
+                                binding.recyclerView.visibility = View.GONE
+                                adapter.submitList(emptyList())
+                            } else {
+                                showEmptyState(false)
+                                binding.recyclerView.visibility = View.VISIBLE
+                                adapter.submitList(favorites)
 
-                        if (favorites.isEmpty()) {
+                            }
+                        }
+                        is UiState.Empty -> {
+                            showLoading(false)
                             showEmptyState(true)
                             binding.recyclerView.visibility = View.GONE
-                            adapter.submitList(emptyList())
-                        } else {
-                            showEmptyState(false)
-                            binding.recyclerView.visibility = View.VISIBLE
-                            adapter.submitList(favorites)
-
                         }
-                    }
-                    is UiState.Error -> {
-                        showLoading(false)
-                        binding.emptyView.visibility = View.VISIBLE
-                        binding.recyclerView.visibility = View.GONE
-                        binding.emptyView.text = state.message ?: "Произошла ошибка"
-                    }
-                    is UiState.Empty -> {
-                        showLoading(false)
-                        showEmptyState(true)
-                        binding.recyclerView.visibility = View.GONE
+
+                        is UiState.Error<*> -> {}
+
                     }
                 }
             }
@@ -118,10 +114,6 @@ class FavoriteFragment : Fragment() {
 
     private fun showEmptyState(show: Boolean) {
         binding.emptyView.visibility = if (show) View.VISIBLE else View.GONE
-    }
-
-    override fun onResume() {
-        super.onResume()
     }
 
     override fun onDestroyView() {

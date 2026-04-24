@@ -79,7 +79,7 @@ class SearchFragment : Fragment() {
     private fun observeViewModel() {
         lifecycleScope.launch {
             viewModel.state.collect { state ->
-                if (!isAdded || _binding == null) return@collect // Защита от NPE
+                if (!isAdded || _binding == null) return@collect
 
                 when(state) {
                     is UiState.Loading -> {

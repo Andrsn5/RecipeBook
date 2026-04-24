@@ -4,21 +4,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@color/background_light">
+    android:background="@color/background">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="vertical">
 
         <!-- Карточка с изображением рецепта -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="250dp"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="8dp"
-            app:cardUseCompatPadding="true">
+            android:layout_height="280dp"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
+            app:cardUseCompatPadding="false"
+            app:strokeWidth="0dp">
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -31,89 +31,106 @@
                     android:scaleType="centerCrop"
                     android:contentDescription="@string/image" />
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:layout_gravity="bottom"
+                    android:background="@drawable/side_nav_bar"
+                    android:alpha="0.5" />
+
                 <ImageButton
                     android:id="@+id/favoriteButton"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
                     android:layout_gravity="top|end"
                     android:layout_margin="16dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:padding="8dp"
+                    android:contentDescription="@string/menu_favorite"
+                    android:padding="12dp"
                     android:scaleType="centerInside"
                     android:src="@drawable/ic_favorite_noselected"
-                    android:contentDescription="@string/menu_favorite"
                     app:tint="@color/white" />
 
             </FrameLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <!-- Информация о рецепте -->
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true">
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:background="@color/surface"
+            android:layout_marginTop="-40dp">
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/recipeTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginBottom="8dp" />
 
-                <TextView
-                    android:id="@+id/recipeTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/purple_700" />
+            <TextView
+                android:id="@+id/recipeCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="normal"
+                android:textColor="@color/primary"
+                android:background="@drawable/bg_search_bar"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:fontFamily="sans-serif-medium" />
 
-                <TextView
-                    android:id="@+id/recipeCategory"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:textSize="16sp"
-                    android:textStyle="italic"
-                    android:textColor="@color/purple_500" />
+            <TextView
+                android:id="@+id/recipeDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:textSize="16sp"
+                android:lineSpacingExtra="4dp"
+                android:textColor="@color/text_secondary"
+                android:fontFamily="sans-serif" />
 
-                <TextView
-                    android:id="@+id/recipeDescription"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:textSize="16sp"
-                    android:lineSpacingExtra="4dp" />
-
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
         <!-- Заголовок ингредиентов -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
             android:layout_marginTop="24dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="12dp"
             android:text="Ингредиенты"
-            android:textSize="20sp"
+            android:textSize="22sp"
             android:textStyle="bold"
-            android:textColor="@color/purple_700" />
+            android:textColor="@color/text_primary"
+            android:fontFamily="sans-serif-medium" />
 
         <!-- Список ингредиентов -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="20dp"
+            android:clipToPadding="false"
             android:nestedScrollingEnabled="false" />
 
         <ProgressBar
             android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyle"
+            style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_margin="32dp"
+            android:indeterminateTint="@color/primary"
             android:visibility="gone" />
 
     </LinearLayout>
