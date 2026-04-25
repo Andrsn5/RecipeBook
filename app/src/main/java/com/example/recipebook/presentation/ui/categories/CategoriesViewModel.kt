@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 @HiltViewModel
 class CategoriesViewModel @Inject constructor(
@@ -39,29 +40,26 @@ class CategoriesViewModel @Inject constructor(
                         is Resource.Loading -> _categoriesState.value = UiState.Loading
                         is Resource.Success -> {
                             val categories = resource.data ?: emptyList()
-                            _categoriesState.value = if (categories.isEmpty()) {
-                                UiState.Empty
-                            } else {
-                                UiState.Success(categories)
-                            }
+                            _categoriesState.value = if (categories.isEmpty()) UiState.Empty
+                            else UiState.Success(categories)
                         }
                         is Resource.Error -> {
-                            val cachedData = resource.data
-                            _categoriesState.value = UiState.Error(resource.message ?: "Unknown error", cachedData)
+                            _categoriesState.value = UiState.Error(
+                                resource.message ?: "Unknown error",
+                                resource.data
+                            )
                         }
                     }
                 }
             } catch (e: Exception) {
-                if (e is kotlinx.coroutines.CancellationException) throw e
+                if (e is CancellationException) throw e
                 _categoriesState.value = UiState.Error(e.localizedMessage ?: "Unknown error")
             }
         }
     }
 
     fun onCategorySelected(category: Category) {
-        viewModelScope.launch {
-            _events.trySend(CategoriesEvent.NavigateToRecipes(category.name))
-        }
+        _events.trySend(CategoriesEvent.NavigateToRecipes(category.name))
     }
 
     sealed interface CategoriesEvent {

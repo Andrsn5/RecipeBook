@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 @HiltViewModel
 class DetailsViewModel @Inject constructor(
@@ -34,11 +35,8 @@ class DetailsViewModel @Inject constructor(
                         is Resource.Loading -> _state.value = UiState.Loading
                         is Resource.Success -> {
                             val recipe = resource.data
-                            if (recipe != null) {
-                                _state.value = UiState.Success(recipe)
-                            } else {
-                                _state.value = UiState.Empty
-                            }
+                            _state.value = if (recipe != null) UiState.Success(recipe)
+                            else UiState.Empty
                         }
                         is Resource.Error -> {
                             _state.value = UiState.Error(resource.message ?: "Unknown error")
@@ -46,7 +44,7 @@ class DetailsViewModel @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                if (e is kotlinx.coroutines.CancellationException) throw e
+                if (e is CancellationException) throw e
                 _state.value = UiState.Error(e.localizedMessage ?: "Unknown error")
             }
         }

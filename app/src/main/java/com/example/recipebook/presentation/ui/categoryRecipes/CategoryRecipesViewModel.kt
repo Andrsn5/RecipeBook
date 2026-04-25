@@ -13,10 +13,10 @@ import com.example.recipebook.presentation.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 @HiltViewModel
 class CategoryRecipesViewModel @Inject constructor(
@@ -27,18 +27,16 @@ class CategoryRecipesViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _recipesState = MutableStateFlow<UiState<List<Recipe>>>(UiState.Loading)
-    val recipesState: StateFlow<UiState<List<Recipe>>> = _recipesState
+    val recipesState: StateFlow<UiState<List<Recipe>>> = _recipesState.asStateFlow()
 
-    private var currentCategory: String? = null
-
+    private val currentCategory: String?
     private var currentOffset = 0
     private var isLoadingMore = false
 
     init {
-        val categoryName = savedStateHandle.get<String>("categoryName")
-        if (categoryName != null) {
-            currentCategory = categoryName
-            loadRecipes(categoryName)
+        currentCategory = savedStateHandle.get<String>("categoryName")
+        if (currentCategory != null) {
+            loadRecipes(currentCategory)
         } else {
             Log.e("CategoryRecipesViewModel", "Category name not found in SavedStateHandle")
             _recipesState.value = UiState.Error("Category not found")
@@ -48,27 +46,26 @@ class CategoryRecipesViewModel @Inject constructor(
     fun loadRecipes(category: String) {
         viewModelScope.launch {
             try {
-                getRecipesByCategoryUseCase(category)
-                    .onEach { resource ->
-                        when (resource) {
-                            is Resource.Loading -> _recipesState.value = UiState.Loading
-                            is Resource.Success -> {
-                                val data = resource.data
-                                data?.let {
-                                    _recipesState.value = if (it.isEmpty()) UiState.Empty else UiState.Success(data)
-                                }
-                            }
-                            is Resource.Error -> {
-                                Log.e("CategoryRecipesViewModel", "Error loading recipes: ${resource.message}")
-                                val cachedData = resource.data
-                                _recipesState.value = UiState.Error(resource.message ?: "Unknown error", cachedData)
-                            }
+                getRecipesByCategoryUseCase(category).collect { resource ->
+                    when (resource) {
+                        is Resource.Loading -> _recipesState.value = UiState.Loading
+                        is Resource.Success -> {
+                            val data = resource.data ?: emptyList()
+                            _recipesState.value = if (data.isEmpty()) UiState.Empty
+                            else UiState.Success(data)
+                        }
+                        is Resource.Error -> {
+                            Log.e("CategoryRecipesViewModel", "Error: ${resource.message}")
+                            _recipesState.value = UiState.Error(
+                                resource.message ?: "Unknown error",
+                                resource.data
+                            )
                         }
                     }
-                    .collect()
+                }
             } catch (e: Exception) {
-                if (e is kotlinx.coroutines.CancellationException) throw e
-                Log.e("CategoryRecipesViewModel", "Exception in loadRecipes: ${e.message}")
+                if (e is CancellationException) throw e
+                Log.e("CategoryRecipesViewModel", "Exception: ${e.message}")
                 _recipesState.value = UiState.Error(e.localizedMessage ?: "Unknown error")
             }
         }
@@ -89,7 +86,8 @@ class CategoryRecipesViewModel @Inject constructor(
                 currentOffset += 20
                 loadMoreRecipesByCategoryUseCase(category, currentOffset)
             } catch (e: Exception) {
-                if (e is kotlinx.coroutines.CancellationException) throw e
+                if (e is CancellationException) throw e
+                currentOffset -= 20
                 _recipesState.value = UiState.Error(e.localizedMessage ?: "Unknown error")
             } finally {
                 isLoadingMore = false
