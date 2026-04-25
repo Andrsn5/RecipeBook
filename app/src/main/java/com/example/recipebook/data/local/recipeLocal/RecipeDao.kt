@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -60,4 +61,15 @@ interface RecipeDao {
         )
     """)
     suspend fun deleteOldNonFavoritesForCategory(category: String, keepCount: Int)
+
+
+    @Transaction
+    suspend fun upsertPreservingFavorites(recipes: List<RecipeEntity>) {
+        val merged = recipes.map { entity ->
+            val existing = getByIdOnce(entity.id)
+            if (existing != null) entity.copy(isFavorite = existing.isFavorite)
+            else entity
+        }
+        insertAll(merged)
+    }
 }
